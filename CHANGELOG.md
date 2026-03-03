@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Comprehensive CLI test suite (test_cli.py) with 16 tests
+- Server feature tests (test_server_features.py) with 18 tests
+- Improved test coverage from 63% to 88%
+  - cli.py: 0% → 88%
+  - server.py: 24% → 71%
+  - __main__.py: 0% → 100%
+- Total test count increased from 113 to 148 tests
+
+### Fixed
+- All new tests passing
+
 ## [0.1.0] - 2026-03-03
 
 ### Added
