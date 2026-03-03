@@ -114,7 +114,7 @@ GAMESS-LSP is a Language Server Protocol implementation for GAMESS (US) quantum 
 - [x] JSON output support
 
 ### Testing
-- [x] **85+ test cases**:
+- [x] **148 test cases**:
   - [x] Parser tests (18 tests)
   - [x] Parser edge case tests (20 tests)
   - [x] Groups data tests (10 tests)
@@ -123,8 +123,10 @@ GAMESS-LSP is a Language Server Protocol implementation for GAMESS (US) quantum 
   - [x] Document symbol tests (8 tests)
   - [x] Folding tests (7 tests)
   - [x] Snippets tests (14 tests)
-  - [x] Server tests (4 tests)
+  - [x] Server tests (22 tests)
+  - [x] CLI tests (16 tests)
   - [x] Integration tests (10 tests)
+- [x] **88% code coverage** (improved from 63%)
 
 ### Examples
 - [x] 6 example input files:
@@ -163,7 +165,8 @@ GAMESS-LSP is a Language Server Protocol implementation for GAMESS (US) quantum 
 | Lines of Code | ~3,500 |
 | $GROUPs Documented | 18 |
 | Parameters Documented | 100+ |
-| Test Cases | 85+ |
+| Test Cases | 148 |
+| Code Coverage | 88% |
 | Code Snippets | 12 |
 | Example Files | 6 |
 | Python Versions Supported | 3.8-3.12 |
