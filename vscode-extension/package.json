@@ -1,0 +1,87 @@
+{
+  "name": "gamess-lsp",
+  "displayName": "GAMESS Language Support",
+  "description": "Language Server Protocol support for GAMESS (US) quantum chemistry input files",
+  "version": "0.1.0",
+  "publisher": "newtontech",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Machine Learning",
+    "Science"
+  ],
+  "keywords": [
+    "gamess",
+    "quantum chemistry",
+    "computational chemistry",
+    "dft",
+    "scf",
+    "lsp"
+  ],
+  "activationEvents": [
+    "onLanguage:gamess"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "gamess",
+        "aliases": ["GAMESS", "gamess"],
+        "extensions": [".inp",".gamess"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "gamess",
+        "scopeName": "source.gamess",
+        "path": "./syntaxes/gamess.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "GAMESS Language Server",
+      "properties": {
+        "gamess-lsp.serverPath": {
+          "type": "string",
+          "default": "gamess-lsp",
+          "description": "Path to the gamess-lsp executable"
+        },
+        "gamess-lsp.logLevel": {
+          "type": "string",
+          "enum": ["debug", "info", "warn", "error"],
+          "default": "info",
+          "description": "Log level for the language server"
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "gamess",
+        "path": "./snippets/gamess.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vsce": "^2.15.0"
+  }
+}

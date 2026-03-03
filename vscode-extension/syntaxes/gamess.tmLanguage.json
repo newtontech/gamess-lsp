@@ -1,0 +1,56 @@
+{
+  "scopeName": "source.gamess",
+  "fileTypes": [".inp", ".gamess"],
+  "name": "GAMESS",
+  "patterns": [
+    {
+      "include": "#comment"
+    },
+    {
+      "include": "#group-start"
+    },
+    {
+      "include": "#group-end"
+    },
+    {
+      "include": "#parameter"
+    },
+    {
+      "include": "#number"
+    },
+    {
+      "include": "#string"
+    }
+  ],
+  "repository": {
+    "comment": {
+      "match": "^\\s*!.*$",
+      "name": "comment.line.exclamation.gamess"
+    },
+    "group-start": {
+      "match": "(\\$)([A-Z][A-Z0-9_]*)",
+      "captures": {
+        "1": { "name": "punctuation.definition.group.gamess" },
+        "2": { "name": "entity.name.type.group.gamess" }
+      }
+    },
+    "group-end": {
+      "match": "\\$END",
+      "name": "keyword.control.end.gamess"
+    },
+    "parameter": {
+      "match": "([A-Z][A-Z0-9_]*)\\s*=",
+      "captures": {
+        "1": { "name": "variable.parameter.gamess" }
+      }
+    },
+    "number": {
+      "match": "\\b[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?\\b",
+      "name": "constant.numeric.gamess"
+    },
+    "string": {
+      "match": "\"[^\"]*\"|'[^']*'",
+      "name": "string.quoted.gamess"
+    }
+  }
+}

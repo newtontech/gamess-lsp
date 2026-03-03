@@ -1,0 +1,7 @@
+include LICENSE
+include README.md
+include CHANGELOG.md
+include CONTRIBUTING.md
+include IMPLEMENTATION_STATUS.md
+recursive-include examples *.inp
+recursive-include tests *.py

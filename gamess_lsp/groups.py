@@ -885,6 +885,159 @@ GAMESS_GROUPS: Dict[str, GroupDoc] = {
         }
     ),
     
+    "MOREAD": GroupDoc(
+        name="MOREAD",
+        description="Read MO coefficients from $VEC group",
+        required=False,
+        parameters={}
+    ),
+    
+    "AUXBAS": GroupDoc(
+        name="AUXBAS",
+        description="Auxiliary basis set for RI methods",
+        required=False,
+        parameters={
+            "AUX": ParameterDoc(
+                name="AUX",
+                description="Auxiliary basis set type",
+                type="string",
+                default="NONE",
+                valid_values=["NONE", "RI", "RIFIT", "JFIT", "JKFIT", "C-FIT", "CC-FIT"]
+            ),
+            "NBFAUX": ParameterDoc(
+                name="NBFAUX",
+                description="Number of auxiliary basis functions",
+                type="integer",
+                default="0"
+            ),
+        }
+    ),
+    
+    "INTGRL": GroupDoc(
+        name="INTGRL",
+        description="Integral control options",
+        required=False,
+        parameters={
+            "CUTTOFF": ParameterDoc(
+                name="CUTTOFF",
+                description="Integral cutoff threshold",
+                type="real",
+                default="1.0E-10"
+            ),
+            "ICUT": ParameterDoc(
+                name="ICUT",
+                description="Integral cutoff control",
+                type="integer",
+                default="11"
+            ),
+            "ITOL": ParameterDoc(
+                name="ITOL",
+                description="Two-electron integral tolerance",
+                type="integer",
+                default="20"
+            ),
+        }
+    ),
+    
+    "TRANS": GroupDoc(
+        name="TRANS",
+        description="Integral transformation options",
+        required=False,
+        parameters={
+            "MP2TRAN": ParameterDoc(
+                name="MP2TRAN",
+                description="MP2 integral transformation method",
+                type="string",
+                default="AUTO",
+                valid_values=["AUTO", "SEMI", "FULL", "INCORE"]
+            ),
+            "DIRTRF": ParameterDoc(
+                name="DIRTRF",
+                description="Direct integral transformation",
+                type="logical",
+                default=".TRUE."
+            ),
+        }
+    ),
+    
+    "CISVEC": GroupDoc(
+        name="CISVEC",
+        description="CIS vector options",
+        required=False,
+        parameters={
+            "IVEC": ParameterDoc(
+                name="IVEC",
+                description="Which CIS vector to print",
+                type="integer",
+                default="1"
+            ),
+            "IVEC1": ParameterDoc(
+                name="IVEC1",
+                description="First CIS vector to print",
+                type="integer",
+                default="1"
+            ),
+            "IVEC2": ParameterDoc(
+                name="IVEC2",
+                description="Last CIS vector to print",
+                type="integer",
+                default="5"
+            ),
+        }
+    ),
+    
+    "DAMP": GroupDoc(
+        name="DAMP",
+        description="Damping options for SCF",
+        required=False,
+        parameters={
+            "DAMP": ParameterDoc(
+                name="DAMP",
+                description="Damping factor",
+                type="real",
+                default="0.0"
+            ),
+            "IDAMP": ParameterDoc(
+                name="IDAMP",
+                description="Damping iteration control",
+                type="integer",
+                default="0"
+            ),
+            "DAMPMX": ParameterDoc(
+                name="DAMPMX",
+                description="Maximum damping factor",
+                type="real",
+                default="0.5"
+            ),
+        }
+    ),
+    
+    "DIIS": GroupDoc(
+        name="DIIS",
+        description="DIIS convergence acceleration",
+        required=False,
+        parameters={
+            "DIIS": ParameterDoc(
+                name="DIIS",
+                description="Use DIIS extrapolation",
+                type="logical",
+                default=".TRUE."
+            ),
+            "NDIIS": ParameterDoc(
+                name="NDIIS",
+                description="Number of DIIS vectors",
+                type="integer",
+                default="10"
+            ),
+            "DIISSV": ParameterDoc(
+                name="DIISSV",
+                description="DIIS convergence threshold",
+                type="real",
+                default="0.1"
+            ),
+        }
+    ),
+    
     "LOCAL": GroupDoc(
         name="LOCAL",
         description="Localized orbital options",

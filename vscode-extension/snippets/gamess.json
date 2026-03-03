@@ -1,0 +1,48 @@
+{
+  "SCF Calculation": {
+    "prefix": "scf",
+    "description": "Single point SCF calculation",
+    "body": [
+      "\$CONTRL SCFTYP=${1|RHF,UHF,ROHF|} RUNTYP=ENERGY \$END",
+      "\$SYSTEM MEMORY=1000000 \$END",
+      "\$BASIS GBASIS=${2|N31,CC-PVDZ,CC-PVTZ|} NGAUSS=6 \$END",
+      "\$GUESS GUESS=HUCKEL \$END",
+      "\$DATA",
+      "${3:Title}",
+      "C1",
+      "${4:C} 6.0 0.0 0.0 0.0",
+      "\$END"
+    ]
+  },
+  "Geometry Optimization": {
+    "prefix": "opt",
+    "description": "Geometry optimization",
+    "body": [
+      "\$CONTRL SCFTYP=${1|RHF,UHF,ROHF|} RUNTYP=OPTIMIZE \$END",
+      "\$SYSTEM MEMORY=1000000 \$END",
+      "\$BASIS GBASIS=${2|N31,CC-PVDZ,CC-PVTZ|} NGAUSS=6 \$END",
+      "\$STATPT NSTEP=100 OPTTOL=0.0001 \$END",
+      "\$GUESS GUESS=HUCKEL \$END",
+      "\$DATA",
+      "${3:Title}",
+      "C1",
+      "${4:C} 6.0 0.0 0.0 0.0",
+      "\$END"
+    ]
+  },
+  "DFT Calculation": {
+    "prefix": "dft",
+    "description": "DFT calculation",
+    "body": [
+      "\$CONTRL SCFTYP=${1|RHF,UHF,ROHF|} RUNTYP=ENERGY DFTTYP=${2|B3LYP,PBE,PBE0,M06|} \$END",
+      "\$SYSTEM MEMORY=1000000 \$END",
+      "\$BASIS GBASIS=${3|N31,CC-PVDZ,CC-PVTZ|} NGAUSS=6 \$END",
+      "\$DFT METHOD=${2} \$END",
+      "\$DATA",
+      "${4:Title}",
+      "C1",
+      "${5:C} 6.0 0.0 0.0 0.0",
+      "\$END"
+    ]
+  }
+}
