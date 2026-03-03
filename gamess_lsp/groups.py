@@ -397,6 +397,520 @@ GAMESS_GROUPS: Dict[str, GroupDoc] = {
             ),
         }
     ),
+
+    "DFT": GroupDoc(
+        name="DFT",
+        description="Density Functional Theory options",
+        required=False,
+        parameters={
+            "METHOD": ParameterDoc(
+                name="METHOD",
+                description="DFT method/functionals",
+                type="string",
+                default="B3LYP",
+                valid_values=[
+                    "B3LYP", "B3LYP5", "B3LYPX", "PBE", "PBE0", "M06", "M06-L",
+                    "M06-2X", "M06-HF", "BLYP", "BP86", "B97-D", "B97-D3",
+                    "CAM-B3LYP", "wB97X", "wB97XD", "LC-wPBE", "MN12-L",
+                    "MN15", "MN15-L", "N12", "N12-SX", "SOGGA11-X", "M11",
+                    "M11-L", "VSXC", "HSE06", "SLATER", "SVWN", "VWN",
+                    "OPTX", "OLYP", "O3LYP", "X3LYP", "B1B95", "BB1K",
+                    "MPW1K", "MPW1PW", "PW91", "TPSS", "revTPSS", "TPSSh",
+                    "SCAN", "RSCAN", "r2SCAN", "r++SCAN", "B97M-V", "B97M-rV",
+                    "WB97M-V", "WB97X-V", "M08-SO", "M08-HX", "M11", "M11-L"
+                ]
+            ),
+            "GRID": ParameterDoc(
+                name="GRID",
+                description="Numerical integration grid",
+                type="string",
+                default="SG1",
+                valid_values=[
+                    "SG1", "FINE", "ULTRAFINE", "COARSE", "MEDIUM", "XFINE"
+                ]
+            ),
+            "NRAD": ParameterDoc(
+                name="NRAD",
+                description="Number of radial grid points",
+                type="integer",
+                default="96"
+            ),
+            "NTHE": ParameterDoc(
+                name="NTHE",
+                description="Number of theta grid points",
+                type="integer",
+                default="12"
+            ),
+            "NPHI": ParameterDoc(
+                name="NPHI",
+                description="Number of phi grid points",
+                type="integer",
+                default="24"
+            ),
+            "NRAD0": ParameterDoc(
+                name="NRAD0",
+                description="Number of radial points for inner atoms",
+                type="integer",
+                default="40"
+            ),
+            "NTHE0": ParameterDoc(
+                name="NTHE0",
+                description="Number of theta points for inner atoms",
+                type="integer",
+                default="8"
+            ),
+            "NPHI0": ParameterDoc(
+                name="NPHI0",
+                description="Number of phi points for inner atoms",
+                type="integer",
+                default="16"
+            ),
+            "DIRECT": ParameterDoc(
+                name="DIRECT",
+                description="Use direct DFT (recompute integrals)",
+                type="logical",
+                default=".TRUE."
+            ),
+            "IDIRECT": ParameterDoc(
+                name="IDIRECT",
+                description="In-core direct DFT algorithm",
+                type="logical",
+                default=".FALSE."
+            ),
+            "DIFF": ParameterDoc(
+                name="DIFF",
+                description="Numerical differentiation for XC functional",
+                type="logical",
+                default=".FALSE."
+            ),
+            "ENCOMP": ParameterDoc(
+                name="ENCOMP",
+                description="Energy computation mode",
+                type="string",
+                default="OFF",
+                valid_values=["OFF", "ON", "ONLY"]
+            ),
+            "TDDFT": ParameterDoc(
+                name="TDDFT",
+                description="Run TDDFT calculation",
+                type="logical",
+                default=".FALSE."
+            ),
+            "NSTATE": ParameterDoc(
+                name="NSTATE",
+                description="Number of excited states for TDDFT",
+                type="integer",
+                default="1"
+            ),
+            "ISTATE": ParameterDoc(
+                name="ISTATE",
+                description="State of interest for TDDFT",
+                type="integer",
+                default="1"
+            ),
+        }
+    ),
+    
+    # Additional GAMESS groups
+    "CIS": GroupDoc(
+        name="CIS",
+        description="Configuration Interaction Singles options",
+        required=False,
+        parameters={
+            "NSTATE": ParameterDoc(
+                name="NSTATE",
+                description="Number of excited states to compute",
+                type="integer",
+                default="1"
+            ),
+            "ISTATE": ParameterDoc(
+                name="ISTATE",
+                description="State of interest for properties",
+                type="integer",
+                default="1"
+            ),
+            "MULT": ParameterDoc(
+                name="MULT",
+                description="Spin multiplicity for excited states",
+                type="integer",
+                valid_values=["1", "3"]
+            ),
+            "DIAGZN": ParameterDoc(
+                name="DIAGZN",
+                description="Diagonalization method",
+                type="string",
+                default="DAVIDSON",
+                valid_values=["DAVIDSON", "JACOBI", "FULL"]
+            ),
+            "NCORE": ParameterDoc(
+                name="NCORE",
+                description="Number of core orbitals to freeze",
+                type="integer",
+                default="0"
+            ),
+        }
+    ),
+    
+    "FORCE": GroupDoc(
+        name="FORCE",
+        description="Force constant and Hessian calculation options",
+        required=False,
+        parameters={
+            "METHOD": ParameterDoc(
+                name="METHOD",
+                description="Method for Hessian calculation",
+                type="string",
+                default="ANALYTIC",
+                valid_values=["ANALYTIC", "NUMERIC", "SEMINUM"]
+            ),
+            "VIBANL": ParameterDoc(
+                name="VIBANL",
+                description="Perform vibrational analysis",
+                type="logical",
+                default=".TRUE."
+            ),
+            "TEMP": ParameterDoc(
+                name="TEMP",
+                description="Temperature for thermodynamic analysis (K)",
+                type="real",
+                default="298.15"
+            ),
+            "PRES": ParameterDoc(
+                name="PRES",
+                description="Pressure for thermodynamic analysis (atm)",
+                type="real",
+                default="1.0"
+            ),
+            "SCAL": ParameterDoc(
+                name="SCAL",
+                description="Scale factor for frequencies",
+                type="real",
+                default="1.0"
+            ),
+        }
+    ),
+    
+    "HESS": GroupDoc(
+        name="HESS",
+        description="Hessian matrix options",
+        required=False,
+        parameters={
+            "PRTIFC": ParameterDoc(
+                name="PRTIFC",
+                description="Print internal force constants",
+                type="logical",
+                default=".FALSE."
+            ),
+            "PRTFCM": ParameterDoc(
+                name="PRTFCM",
+                description="Print full Cartesian force constant matrix",
+                type="logical",
+                default=".FALSE."
+            ),
+            "HLONLY": ParameterDoc(
+                name="HLONLY",
+                description="High level only in Hessian calculation",
+                type="logical",
+                default=".FALSE."
+            ),
+        }
+    ),
+    
+    "MP2": GroupDoc(
+        name="MP2",
+        description="MP2 perturbation theory options",
+        required=False,
+        parameters={
+            "METHOD": ParameterDoc(
+                name="METHOD",
+                description="MP2 algorithm",
+                type="string",
+                default="SEMI",
+                valid_values=["SEMI", "FULL", "LOCAL"]
+            ),
+            "INCORE": ParameterDoc(
+                name="INCORE",
+                description="Use in-core integrals",
+                type="logical",
+                default=".FALSE."
+            ),
+            "CUTHF": ParameterDoc(
+                name="CUTHF",
+                description="Threshold for integral screening",
+                type="real",
+                default="1.0E-09"
+            ),
+            "NBOS": ParameterDoc(
+                name="NBOS",
+                description="Number of occupied orbitals to freeze",
+                type="integer",
+                default="0"
+            ),
+            "NVIR": ParameterDoc(
+                name="NVIR",
+                description="Number of virtual orbitals to freeze",
+                type="integer",
+                default="0"
+            ),
+        }
+    ),
+    
+    "CC": GroupDoc(
+        name="CC",
+        description="Coupled Cluster options",
+        required=False,
+        parameters={
+            "CONV": ParameterDoc(
+                name="CONV",
+                description="Convergence criterion for CC amplitudes",
+                type="real",
+                default="1.0E-06"
+            ),
+            "MAXIT": ParameterDoc(
+                name="MAXIT",
+                description="Maximum number of CC iterations",
+                type="integer",
+                default="50"
+            ),
+            "NCORE": ParameterDoc(
+                name="NCORE",
+                description="Number of core orbitals to freeze",
+                type="integer",
+                default="0"
+            ),
+            "NACT": ParameterDoc(
+                name="NACT",
+                description="Number of active orbitals",
+                type="integer",
+                default="0"
+            ),
+        }
+    ),
+    
+    "EOM": GroupDoc(
+        name="EOM",
+        description="Equation of Motion coupled cluster options",
+        required=False,
+        parameters={
+            "NSTATE": ParameterDoc(
+                name="NSTATE",
+                description="Number of excited states",
+                type="integer",
+                default="1"
+            ),
+            "MULT": ParameterDoc(
+                name="MULT",
+                description="Spin multiplicity",
+                type="integer",
+                valid_values=["1", "3"]
+            ),
+            "IROOT": ParameterDoc(
+                name="IROOT",
+                description="Root number for state of interest",
+                type="integer",
+                default="1"
+            ),
+        }
+    ),
+    
+    "PCM": GroupDoc(
+        name="PCM",
+        description="Polarizable Continuum Model solvation",
+        required=False,
+        parameters={
+            "SMD": ParameterDoc(
+                name="SMD",
+                description="Use SMD solvation model",
+                type="logical",
+                default=".FALSE."
+            ),
+            "SOLVNT": ParameterDoc(
+                name="SOLVNT",
+                description="Solvent name",
+                type="string",
+                valid_values=["WATER", "ACETONITRILE", "METHANOL", "ETHANOL", "DMSO", "DMF", "THF", "DCM", "BENZENE", "TOLUENE", "CYCLOHEXANE", "HEPTANE", "ANILINE", "ETHER", "CHLOROFORM", "OCTANOL"]
+            ),
+            "ICAV": ParameterDoc(
+                name="ICAV",
+                description="Cavity type",
+                type="integer",
+                default="0"
+            ),
+            "IDISP": ParameterDoc(
+                name="IDISP",
+                description="Dispersion correction",
+                type="integer",
+                default="0"
+            ),
+        }
+    ),
+    
+    "COSMO": GroupDoc(
+        name="COSMO",
+        description="Conductor-like Screening Model",
+        required=False,
+        parameters={
+            "EPS": ParameterDoc(
+                name="EPS",
+                description="Dielectric constant",
+                type="real",
+                default="78.39"
+            ),
+            "RSOLV": ParameterDoc(
+                name="RSOLV",
+                description="Solvent radius (Angstroms)",
+                type="real",
+                default="1.30"
+            ),
+            "ICORR": ParameterDoc(
+                name="ICORR",
+                description="Correction for outlying charge",
+                type="integer",
+                default="1"
+            ),
+        }
+    ),
+    
+    "VEC": GroupDoc(
+        name="VEC",
+        description="Vector (molecular orbital) manipulation",
+        required=False,
+        parameters={
+            "MOMAX": ParameterDoc(
+                name="MOMAX",
+                description="Maximum number of MOs to print",
+                type="integer",
+                default="99999"
+            ),
+            "MOINT": ParameterDoc(
+                name="MOINT",
+                description="MOs to interchange",
+                type="string"
+            ),
+        }
+    ),
+    
+    "POP": GroupDoc(
+        name="POP",
+        description="Population analysis options",
+        required=False,
+        parameters={
+            "MULIKEN": ParameterDoc(
+                name="MULIKEN",
+                description="Print Mulliken population analysis",
+                type="logical",
+                default=".TRUE."
+            ),
+            "LOWDIN": ParameterDoc(
+                name="LOWDIN",
+                description="Print Lowdin population analysis",
+                type="logical",
+                default=".FALSE."
+            ),
+            "BOND": ParameterDoc(
+                name="BOND",
+                description="Print bond order analysis",
+                type="logical",
+                default=".FALSE."
+            ),
+        }
+    ),
+    
+    "ELMOM": GroupDoc(
+        name="ELMOM",
+        description="Electric moments calculation",
+        required=False,
+        parameters={
+            "WHERE": ParameterDoc(
+                name="WHERE",
+                description="Where to compute moments",
+                type="string",
+                default="PDCENTER",
+                valid_values=["PDCENTER", "ORIGIN", "POINT"]
+            ),
+            "IEMOM": ParameterDoc(
+                name="IEMOM",
+                description="Which moments to compute",
+                type="string",
+                default="111111",
+            ),
+        }
+    ),
+    
+    "ELPOT": GroupDoc(
+        name="ELPOT",
+        description="Electrostatic potential calculation",
+        required=False,
+        parameters={
+            "WHERE": ParameterDoc(
+                name="WHERE",
+                description="Where to compute potential",
+                type="string",
+                default="PDCENTER",
+                valid_values=["PDCENTER", "ORIGIN", "POINT", "GRID"]
+            ),
+            "OUTPUT": ParameterDoc(
+                name="OUTPUT",
+                description="Output format",
+                type="string",
+                default="PUNCH",
+                valid_values=["PUNCH", "6", "BOTH"]
+            ),
+        }
+    ),
+    
+    "PDC": GroupDoc(
+        name="PDC",
+        description="Potential-derived charges",
+        required=False,
+        parameters={
+            "NPTE": ParameterDoc(
+                name="NPTE",
+                description="Number of points per unit sphere",
+                type="integer",
+                default="12"
+            ),
+            "NPTP": ParameterDoc(
+                name="NPTP",
+                description="Number of radial points",
+                type="integer",
+                default="4"
+            ),
+            "RMAX": ParameterDoc(
+                name="RMAX",
+                description="Maximum radius for charges (Angstroms)",
+                type="real",
+                default="2.8"
+            ),
+        }
+    ),
+    
+    "LOCAL": GroupDoc(
+        name="LOCAL",
+        description="Localized orbital options",
+        required=False,
+        parameters={
+            "METHOD": ParameterDoc(
+                name="METHOD",
+                description="Localization method",
+                type="string",
+                default="POP",
+                valid_values=["POP", "PM", "ER", "FB", "BOYS", "PIPEK-MEZEY"]
+            ),
+            "TOL": ParameterDoc(
+                name="TOL",
+                description="Convergence tolerance",
+                type="real",
+                default="1.0E-06"
+            ),
+            "MAXIT": ParameterDoc(
+                name="MAXIT",
+                description="Maximum iterations",
+                type="integer",
+                default="100"
+            ),
+        }
+    ),
 }
 
 

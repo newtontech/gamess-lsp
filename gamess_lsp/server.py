@@ -9,6 +9,9 @@ from lsprotocol.types import (
     TEXT_DOCUMENT_DID_CHANGE,
     TEXT_DOCUMENT_DID_OPEN,
     TEXT_DOCUMENT_HOVER,
+    TEXT_DOCUMENT_DIAGNOSTIC,
+    TEXT_DOCUMENT_DOCUMENT_SYMBOL,
+    TEXT_DOCUMENT_FOLDING_RANGE,
     CompletionItem,
     CompletionItemKind,
     CompletionList,
@@ -21,6 +24,7 @@ from lsprotocol.types import (
     MarkupKind,
     Position,
     TextDocumentContentChangeEvent,
+    DiagnosticOptions,
 )
 from pygls.server import LanguageServer
 
@@ -32,6 +36,10 @@ from .groups import (
     get_parameter_documentation,
 )
 from .parser import GamessParser
+from .diagnostics import GamessDiagnostics
+from .document_symbols import DocumentSymbolProvider
+from .folding import FoldingRangeProvider
+from .snippets import get_all_snippets
 
 
 logging.basicConfig(level=logging.INFO)
@@ -44,7 +52,10 @@ class GamessLanguageServer(LanguageServer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.parser = GamessParser()
+        self.diagnostics = GamessDiagnostics()
         self.documents: dict = {}
+        self.symbol_provider = DocumentSymbolProvider()
+        self.folding_provider = FoldingRangeProvider()
 
 
 server = GamessLanguageServer("gamess-lsp", "v0.1.0")
@@ -56,7 +67,12 @@ def did_open(ls: GamessLanguageServer, params: DidOpenTextDocumentParams):
     uri = params.text_document.uri
     content = params.text_document.text
     ls.documents[uri] = content
-    logger.info(f"Opened document: {uri}")
+    
+    # Run diagnostics on open
+    diagnostics = ls.diagnostics.validate(content)
+    ls.publish_diagnostics(uri, diagnostics)
+    
+    logger.info(f"Opened document: {uri}, found {len(diagnostics)} diagnostics")
 
 
 @server.feature(TEXT_DOCUMENT_DID_CHANGE)
@@ -67,6 +83,13 @@ def did_change(ls: GamessLanguageServer, params: DidChangeTextDocumentParams):
     for change in params.content_changes:
         if hasattr(change, 'text'):
             ls.documents[uri] = change.text
+    
+    # Run diagnostics on change
+    if uri in ls.documents:
+        diagnostics = ls.diagnostics.validate(ls.documents[uri])
+        ls.publish_diagnostics(uri, diagnostics)
+        logger.debug(f"Changed document: {uri}, found {len(diagnostics)} diagnostics")
+    
     logger.debug(f"Changed document: {uri}")
 
 
@@ -89,6 +112,18 @@ def completions(ls: GamessLanguageServer, params: CompletionParams) -> Optional[
     line_before_cursor = current_line[:position.character]
     
     items = []
+    
+    # Check for snippet triggers at line start
+    if not line_before_cursor.strip():
+        # Add snippets
+        for snippet in get_all_snippets():
+            items.append(CompletionItem(
+                label=snippet.prefix,
+                kind=CompletionItemKind.Snippet,
+                documentation=snippet.description,
+                insert_text='\n'.join(snippet.body),
+                insert_text_format=2,  # Snippet format
+            ))
     
     # Check if we're typing a $GROUP
     if '$' in line_before_cursor:
@@ -253,6 +288,30 @@ def hover(ls: GamessLanguageServer, params: HoverParams) -> Optional[Hover]:
                 break
     
     return None
+
+
+@server.feature(TEXT_DOCUMENT_DOCUMENT_SYMBOL)
+def document_symbol(ls: GamessLanguageServer, params):
+    """Provide document symbols for outline view."""
+    uri = params.text_document.uri
+    
+    if uri not in ls.documents:
+        return []
+    
+    content = ls.documents[uri]
+    return ls.symbol_provider.get_document_symbols(content)
+
+
+@server.feature(TEXT_DOCUMENT_FOLDING_RANGE)
+def folding_range(ls: GamessLanguageServer, params):
+    """Provide folding ranges."""
+    uri = params.text_document.uri
+    
+    if uri not in ls.documents:
+        return []
+    
+    content = ls.documents[uri]
+    return ls.folding_provider.get_folding_ranges(content)
 
 
 def _get_word_at_position(line: str, character: int) -> Optional[str]:
