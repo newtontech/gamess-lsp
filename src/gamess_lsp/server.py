@@ -41,6 +41,7 @@ from pygls.workspace import Document
 
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from .parser import GAMESSParser
+from .validator import validate_semantics
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -209,11 +210,17 @@ H     1.0   0.000000   0.757210  -0.469957
 
 
 def _get_diagnostics(content: str) -> List[Diagnostic]:
-    """Get diagnostics for GAMESS input content."""
+    """Get diagnostics for GAMESS input content.
+
+    This combines syntax-level diagnostics from the parser with
+    semantic-level diagnostics from the validator.
+    """
     parser = GAMESSParser()
-    parser.parse(content)
+    parsed_input = parser.parse(content)
 
     diagnostics = []
+
+    # 1. Syntax-level diagnostics from parser
     for item in parser.get_diagnostics():
         severity = DiagnosticSeverity.Warning
         if item.get("severity") == "error":
@@ -228,6 +235,26 @@ def _get_diagnostics(content: str) -> List[Diagnostic]:
                 message=item.get("message", ""),
                 severity=severity,
                 source="gamess-lsp",
+            )
+        )
+
+    # 2. Semantic-level diagnostics from validator
+    semantic_diagnostics = validate_semantics(parsed_input)
+    for diag in semantic_diagnostics:
+        severity = DiagnosticSeverity.Warning
+        if diag.severity == "error":
+            severity = DiagnosticSeverity.Error
+
+        line = diag.line - 1  # Convert to 0-based
+        diagnostics.append(
+            Diagnostic(
+                range=Range(
+                    start=Position(line=line, character=0), end=Position(line=line, character=100)
+                ),
+                message=diag.message,
+                severity=severity,
+                source="gamess-lsp",
+                code=diag.code,
             )
         )
 
