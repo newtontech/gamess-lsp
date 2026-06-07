@@ -47,6 +47,12 @@ gamess-lsp
 
 The server communicates via stdio using the LSP protocol.
 
+## OpenQC Alignment
+
+This repository is part of the newtontech computational chemistry LSP family. `newtontech/OpenQC-VSCode` is the VS Code-facing integration layer for this server.
+
+When changing diagnostics, completions, snippets, hover text, file detection, or parser fixtures, also update or open an alignment issue in `OpenQC-VSCode` so the extension behavior stays consistent with `gamess-lsp`.
+
 ### Editor Integration
 
 #### VS Code
