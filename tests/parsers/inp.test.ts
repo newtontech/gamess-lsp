@@ -2,19 +2,19 @@
  * Tests for GAMESS Input File Parser
  */
 
-import { 
-  parseGamessInput, 
+import {
+  parseGamessInput,
   validateGamessInput,
   ControlGroup,
   BasisGroup,
   DataGroup,
-  GamessInput 
+  GamessInput
 } from '../../src/parsers/inp';
 
 describe('GAMESS Input Parser', () => {
-  
+
   describe('parseGamessInput', () => {
-    
+
     it('should parse water molecule with C1 symmetry', () => {
       const input = `
  $CONTRL SCFTYP=RHF RUNTYP=OPTIMIZE $END
@@ -159,7 +159,7 @@ H 1 0.0 0.0 0.0
   });
 
   describe('validateGamessInput', () => {
-    
+
     it('should return no errors for valid water input', () => {
       const input = `
  $CONTRL SCFTYP=RHF $END

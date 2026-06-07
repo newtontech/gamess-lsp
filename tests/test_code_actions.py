@@ -2,13 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from lsprotocol.types import (
-    CodeActionParams,
-    Position,
-    Range,
-    RenameParams,
-    TextDocumentIdentifier,
-)
+from lsprotocol.types import CodeActionParams, Position, Range, RenameParams, TextDocumentIdentifier
 
 from gamess_lsp.server import code_action, rename
 
