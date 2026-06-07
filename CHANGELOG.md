@@ -10,31 +10,21 @@ All notable changes to this project will be documented in this file.
   - IRC calculation (Intrinsic Reaction Coordinate)
   - CCSD(T) calculation (Coupled Cluster with perturbative triples)
   - PCM solvation in water (Polarizable Continuum Model)
-- Added 4 new tests for snippet templates
-- Test count increased from 157 to 161 tests
 
 ### Changed
 - Enhanced snippet coverage for advanced GAMESS calculations
-- All tests passing with 100% code coverage
+- CI now enstrict test failures (no longer masks failures)
+- Dependency version constraints tightened for stability
 
 ## [0.2.4] - 2026-03-05
 
 ### Fixed
 - Added E203 to flake8 ignore list for black compatibility
 
-### Changed
-- All 130 tests passing
-- All code quality tools passing (flake8, mypy, black)
-- Clean git status
-
 ## [0.2.3] - 2026-03-05
 
 ### Fixed
 - Fixed black formatting (E203) in parser.py
-
-### Changed
-- All 130 tests passing
-- All code quality tools passing (flake8, mypy, black)
 
 ## [0.2.2] - 2026-03-04
 
@@ -47,20 +37,12 @@ All notable changes to this project will be documented in this file.
 - Comprehensive test suite for document_symbol feature
 - 4 new tests for document symbols
 
-### Changed
-- Updated test count to 130 tests
-- All code quality tools passing
-
 ## [0.2.1] - 2026-03-04
 
 ### Fixed
 - Fixed Python escape sequence warnings by converting snippet insertText to raw strings
 - Fixed broken imports in test_formatting.py and test_document_symbol.py
 - Updated coverage configuration files
-
-### Changed
-- All 126 tests passing
-- Clean test output with no deprecation warnings
 
 ## [0.2.0] - 2026-03-04
 
@@ -84,7 +66,6 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Updated README.md with new features documentation
 - Enhanced completion provider to include snippet suggestions
-- Updated test count to 129 tests (100% coverage)
 
 ### Fixed
 - Fixed escape character issues in snippet templates
@@ -104,7 +85,7 @@ All notable changes to this project will be documented in this file.
   - Suggest corrections for unknown groups
   - Add required keywords (e.g., RUNTYP for \$CONTRL)
 - Rename support for groups and keywords
-- Comprehensive test suite (109 tests, 100% coverage)
+- Comprehensive test suite
 
 ### Supported Features
 - Core GAMESS groups: CONTRL, SYSTEM, BASIS, DATA, SCF, DFT, etc.
