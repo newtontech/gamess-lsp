@@ -250,7 +250,7 @@ class GAMESSParser:
         for line_num, line in geometry_lines:
             # Strip comments
             if "!" in line:
-                line = line[:line.index("!")].strip()
+                line = line[: line.index("!")].strip()
 
             parts = line.split()
             if len(parts) < 4:

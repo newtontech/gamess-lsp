@@ -2,11 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from lsprotocol.types import (
-    DocumentSymbolParams,
-    SymbolKind,
-    TextDocumentIdentifier,
-)
+from lsprotocol.types import DocumentSymbolParams, SymbolKind, TextDocumentIdentifier
 
 from gamess_lsp.server import document_symbol
 

@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 
 from .constants import ELEMENT_ATOMIC_NUMBERS
-from .parser import GAMESSInputFile, GAMESSGroup
+from .parser import GAMESSGroup, GAMESSInputFile
 
 
 @dataclass

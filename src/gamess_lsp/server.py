@@ -1,9 +1,12 @@
 """GAMESS Language Server Protocol implementation."""
 
 import logging
+import os
 import re
+from collections import OrderedDict
 from difflib import get_close_matches
 from typing import Any, List, Optional
+from urllib.parse import urlparse
 
 from lsprotocol.types import (
     CodeAction,
@@ -44,14 +47,115 @@ from .parser import GAMESSParser
 from .tokenizer import tokenize_line
 from .validator import validate_semantics
 
-logging.basicConfig(level=logging.INFO)
+# Security: Use WARNING as default log level to prevent information disclosure
+LOG_LEVEL = os.getenv("GAMESS_LSP_LOG_LEVEL", "WARNING")
+logging.basicConfig(
+    level=getattr(logging, LOG_LEVEL), format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 server = LanguageServer("gamess-lsp", "0.1.0")
 
+# Resource limits for DoS protection
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+MAX_LINES = 100000
+MAX_CACHE_SIZE = 100
+MAX_CONTENT_SIZE = 10 * 1024 * 1024  # 10MB
 
-# Store document states
-document_cache: dict = {}
+
+class DocumentCache:
+    """LRU cache with URI validation and size limits."""
+
+    def __init__(self, max_size: int = MAX_CACHE_SIZE, max_content_size: int = MAX_CONTENT_SIZE):
+        self._cache: OrderedDict[str, str] = OrderedDict()
+        self._max_size = max_size
+        self._max_content_size = max_content_size
+
+    def _is_valid_uri(self, uri: str) -> bool:
+        """Validate that URI is a legitimate document URI."""
+        try:
+            parsed = urlparse(uri)
+            # Only accept file:// or untitled:// schemes, prevent path traversal
+            return parsed.scheme in ("file", "untitled") and ".." not in parsed.path
+        except Exception:
+            return False
+
+    def get(self, uri: str) -> Optional[str]:
+        """Get content from cache."""
+        return self._cache.get(uri)
+
+    def set(self, uri: str, content: str) -> None:
+        """Set content in cache with validation."""
+        if not self._is_valid_uri(uri):
+            logger.warning(f"Invalid URI rejected: {uri}")
+            return
+        if len(content) > self._max_content_size:
+            logger.warning(f"Content too large for {uri}: {len(content)} bytes")
+            return
+        self._cache[uri] = content
+        self._cache.move_to_end(uri)
+        if len(self._cache) > self._max_size:
+            self._cache.popitem(last=False)
+
+    def clear(self) -> None:
+        """Clear the cache."""
+        self._cache.clear()
+
+    def items(self):
+        """Return cache items."""
+        return self._cache.items()
+
+
+# Create document cache instance
+document_cache = DocumentCache()
+
+
+def _is_valid_document_uri(uri: str) -> bool:
+    """Validate that URI is a legitimate document URI."""
+    try:
+        parsed = urlparse(uri)
+        return parsed.scheme in ("file", "untitled") and ".." not in parsed.path
+    except Exception:
+        return False
+
+
+def _check_content_size(content: str, uri: str) -> Optional[List[Diagnostic]]:
+    """Check content size and return error diagnostic if too large."""
+    if len(content) > MAX_FILE_SIZE:
+        logger.warning(f"File too large: {len(content)} bytes")
+        return [
+            Diagnostic(
+                range=Range(
+                    start=Position(line=0, character=0), end=Position(line=0, character=100)
+                ),
+                message=f"File exceeds maximum size of {MAX_FILE_SIZE} bytes",
+                severity=DiagnosticSeverity.Error,
+            )
+        ]
+    lines = content.split("\n")
+    if len(lines) > MAX_LINES:
+        logger.warning(f"File has too many lines: {len(lines)}")
+        return [
+            Diagnostic(
+                range=Range(
+                    start=Position(line=0, character=0), end=Position(line=0, character=100)
+                ),
+                message=f"File exceeds maximum line count of {MAX_LINES}",
+                severity=DiagnosticSeverity.Error,
+            )
+        ]
+    return None
+
+
+def log_document_action(action: str, uri: str, content: Optional[str] = None) -> None:
+    """Safely log document actions without exposing content."""
+    # Only log the filename, not full path
+    safe_uri = os.path.basename(uri) if uri else "unknown"
+    logger.info(f"{action}: {safe_uri}")
+    # Never log content at INFO level, only DEBUG and truncate
+    if content and logger.isEnabledFor(logging.DEBUG):
+        preview = content[:100].replace("\n", " ") + "..." if len(content) > 100 else content
+        logger.debug(f"Content preview: {preview}")
 
 
 # GAMESS snippet templates
@@ -216,6 +320,11 @@ def _get_diagnostics(content: str) -> List[Diagnostic]:
     This combines syntax-level diagnostics from the parser with
     semantic-level diagnostics from the validator.
     """
+    # Security: Check content size before parsing
+    size_error = _check_content_size(content, "")
+    if size_error:
+        return size_error
+
     parser = GAMESSParser()
     parsed_input = parser.parse(content)
 
@@ -265,7 +374,7 @@ def _get_diagnostics(content: str) -> List[Diagnostic]:
 def _update_document(doc: Document) -> None:
     """Update cached document and publish diagnostics."""
     content = doc.source
-    document_cache[doc.uri] = content
+    document_cache.set(doc.uri, content)
 
     diagnostics = _get_diagnostics(content)
     server.publish_diagnostics(doc.uri, diagnostics)
@@ -662,12 +771,14 @@ def references(params: ReferenceParams) -> Optional[List[Location]]:
         return None
 
     word_upper = word.upper()
+    # Security: Escape regex special characters in user input
+    escaped_word = re.escape(word_upper)
 
     locations: List[Location] = []
     lines = content.split("\n")
 
     for i, line_content in enumerate(lines):
-        if re.search(rf"\\${word_upper}\b", line_content, re.IGNORECASE):
+        if re.search(rf"\\${escaped_word}\b", line_content, re.IGNORECASE):
             locations.append(
                 Location(
                     uri=params.text_document.uri,
@@ -677,7 +788,7 @@ def references(params: ReferenceParams) -> Optional[List[Location]]:
                     ),
                 )
             )
-        elif re.search(rf"\b{word_upper}\s*=", line_content, re.IGNORECASE):
+        elif re.search(rf"\b{escaped_word}\s*=", line_content, re.IGNORECASE):
             locations.append(
                 Location(
                     uri=params.text_document.uri,
@@ -811,8 +922,10 @@ def rename(params: RenameParams) -> Optional[WorkspaceEdit]:
         if group_name in parsed.groups:
             changes = []
             lines = content.split("\n")
+            # Security: Escape regex special characters in user input
+            escaped_group_name = re.escape(group_name)
             for i, line_content in enumerate(lines):
-                match = re.match(rf"^\s*\$({group_name})\b", line_content, re.IGNORECASE)
+                match = re.match(rf"^\s*\$({escaped_group_name})\b", line_content, re.IGNORECASE)
                 if match:
                     start_char = line_content.find(f"${group_name}")
                     if start_char == -1:

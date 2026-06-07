@@ -2,11 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from lsprotocol.types import (
-    DocumentFormattingParams,
-    FormattingOptions,
-    TextDocumentIdentifier,
-)
+from lsprotocol.types import DocumentFormattingParams, FormattingOptions, TextDocumentIdentifier
 
 from gamess_lsp.server import _format_keywords, formatting
 
