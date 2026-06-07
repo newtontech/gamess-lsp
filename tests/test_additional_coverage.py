@@ -10,10 +10,7 @@ from lsprotocol.types import (
     VersionedTextDocumentIdentifier,
 )
 
-from gamess_lsp.server import (
-    did_change,
-    did_open,
-)
+from gamess_lsp.server import did_change, did_open
 
 
 class TestDocumentEventsCoverage:
