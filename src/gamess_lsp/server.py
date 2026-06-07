@@ -41,6 +41,7 @@ from pygls.workspace import Document
 
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from .parser import GAMESSParser
+from .tokenizer import tokenize_line
 from .validator import validate_semantics
 
 logging.basicConfig(level=logging.INFO)
@@ -496,29 +497,7 @@ def formatting(params: DocumentFormattingParams) -> List[TextEdit]:
 
 def _format_keywords(line: str) -> str:
     """Format a line of keyword=value pairs."""
-    tokens = []
-    current = ""
-    in_quotes = False
-    quote_char = None
-
-    for char in line:
-        if char in "\"'":
-            if not in_quotes:
-                in_quotes = True
-                quote_char = char
-            elif char == quote_char:
-                in_quotes = False
-                quote_char = None
-            current += char
-        elif char == " " and not in_quotes:
-            if current:
-                tokens.append(current)
-                current = ""
-        else:
-            current += char
-
-    if current:
-        tokens.append(current)
+    tokens = tokenize_line(line)
 
     formatted_tokens = []
     for token in tokens:
