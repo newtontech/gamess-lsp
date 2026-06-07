@@ -7,7 +7,7 @@ name = "gamess-lsp"
 version = "0.1.0"
 description = "Language Server Protocol for GAMESS input files"
 readme = "README.md"
-license = {text = "MIT"}
+license = {file = "LICENSE"}
 requires-python = ">=3.9"
 dependencies = [
     "pygls>=1.2.0,<2.0.0",
