@@ -4,6 +4,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
+from .tokenizer import tokenize_line
+
 
 @dataclass
 class GAMESSKeyword:
@@ -221,8 +223,7 @@ class GAMESSParser:
 
     def _parse_keywords(self, line: str, group: GAMESSGroup, line_num: int) -> None:
         """Parse keyword-value pairs from a line."""
-        # Split by spaces but handle quoted values
-        tokens = self._tokenize(line)
+        tokens = tokenize_line(line)
 
         for token in tokens:
             if "=" in token:
@@ -233,34 +234,6 @@ class GAMESSParser:
                         name=key.strip(), value=value.strip().strip("\"'"), line_number=line_num
                     )
                     group.add_keyword(keyword)
-
-    def _tokenize(self, line: str) -> List[str]:
-        """Tokenize a line into keyword=value pairs."""
-        tokens = []
-        current = ""
-        in_quotes = False
-        quote_char = None
-
-        for char in line:
-            if char in "\"'":
-                if not in_quotes:
-                    in_quotes = True
-                    quote_char = char
-                elif char == quote_char:
-                    in_quotes = False
-                    quote_char = None
-                current += char
-            elif char == " " and not in_quotes:
-                if current:
-                    tokens.append(current)
-                    current = ""
-            else:
-                current += char
-
-        if current:
-            tokens.append(current)
-
-        return tokens
 
     def _parse_geometry(self, geometry_lines: List[Tuple[int, str]]) -> List[Dict[str, Any]]:
         """Parse geometry lines.
