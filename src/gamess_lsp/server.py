@@ -43,6 +43,7 @@ from pygls.server import LanguageServer
 from pygls.workspace import Document
 
 from .features.diagnostic import DiagnosticProvider
+from .features.typecheck import TypecheckProvider
 from .features.lint import LintProvider
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from .parser import GAMESSParser
@@ -374,6 +375,10 @@ def _get_diagnostics(content: str) -> List[Diagnostic]:
             )
         )
 
+
+    # 3. Typecheck diagnostics (enum, type, required sections)
+    typecheck_provider = TypecheckProvider()
+    diagnostics.extend(typecheck_provider.validate(parsed_input))
     return diagnostics
 
 

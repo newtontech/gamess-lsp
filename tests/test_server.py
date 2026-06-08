@@ -32,7 +32,8 @@ class TestGetDiagnostics:
         """Test diagnostics for empty content."""
         diagnostics = _get_diagnostics("")
         assert isinstance(diagnostics, list)
-        assert len(diagnostics) == 0
+        # Empty input triggers missing required group diagnostics from typecheck
+        assert all(d.source == "gamess-lsp-typecheck" for d in diagnostics)
 
     def test_get_diagnostics_warning(self):
         """Test diagnostics with warning."""

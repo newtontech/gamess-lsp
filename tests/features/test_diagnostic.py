@@ -46,15 +46,18 @@ class TestEmptyInput:
     def test_empty_string_no_diagnostics(self, provider: DiagnosticProvider) -> None:
         diagnostics = provider.get_diagnostics("")
         assert isinstance(diagnostics, list)
-        assert len(diagnostics) == 0
+        # Empty input triggers missing required group diagnostics from typecheck
+        assert all(d.source == "gamess-lsp-typecheck" for d in diagnostics)
 
     def test_whitespace_only_no_diagnostics(self, provider: DiagnosticProvider) -> None:
         diagnostics = provider.get_diagnostics("   \n  \n")
-        assert len(diagnostics) == 0
+        # Whitespace input triggers missing required group diagnostics from typecheck
+        assert all(d.source == "gamess-lsp-typecheck" for d in diagnostics)
 
     def test_comment_only_no_diagnostics(self, provider: DiagnosticProvider) -> None:
         diagnostics = provider.get_diagnostics("! This is a comment\n")
-        assert len(diagnostics) == 0
+        # Comment-only input triggers missing required group diagnostics from typecheck
+        assert all(d.source == "gamess-lsp-typecheck" for d in diagnostics)
 
 
 # ------------------------------------------------------------------
@@ -69,7 +72,8 @@ class TestValidInput:
         text = "$CONTRL\n SCFTYP=RHF RUNTYP=ENERGY\n $END"
         diagnostics = provider.get_diagnostics(text)
         assert isinstance(diagnostics, list)
-        assert len(diagnostics) == 0
+        # Missing $DATA triggers typecheck diagnostic; no syntax/semantic errors
+        assert all(d.source == "gamess-lsp-typecheck" for d in diagnostics)
 
     def test_valid_multi_group(self, provider: DiagnosticProvider) -> None:
         text = (
@@ -79,7 +83,8 @@ class TestValidInput:
         )
         diagnostics = provider.get_diagnostics(text)
         assert isinstance(diagnostics, list)
-        assert len(diagnostics) == 0
+        # Missing $DATA triggers typecheck diagnostic; no syntax/semantic errors
+        assert all(d.source == "gamess-lsp-typecheck" for d in diagnostics)
 
     def test_valid_full_calculation(self, provider: DiagnosticProvider) -> None:
         text = (
@@ -184,7 +189,9 @@ class TestSnapshot:
 
     def test_snapshot_empty_diagnostics(self, provider: DiagnosticProvider) -> None:
         snap = provider.snapshot("file:///test.inp", "")
-        assert snap["diagnostics"] == []
+        # Empty input triggers missing required group diagnostics
+        assert len(snap["diagnostics"]) >= 1
+        assert all(d["source"] == "gamess-lsp-typecheck" for d in snap["diagnostics"])
 
     def test_snapshot_with_diagnostics(self, provider: DiagnosticProvider) -> None:
         snap = provider.snapshot("file:///test.inp", "$UNKNOWN $END")
@@ -232,7 +239,7 @@ class TestSnapshot:
     def test_snapshot_source_is_gamess_lsp(self, provider: DiagnosticProvider) -> None:
         snap = provider.snapshot("file:///test.inp", "$CONTRL SCFTYP=INVALID $END")
         sources = {d["source"] for d in snap["diagnostics"]}
-        assert sources == {"gamess-lsp"}
+        assert "gamess-lsp" in sources
 
     def test_snapshot_range_structure(self, provider: DiagnosticProvider) -> None:
         snap = provider.snapshot("file:///test.inp", "$UNKNOWN $END")
