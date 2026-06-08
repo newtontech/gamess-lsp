@@ -42,6 +42,7 @@ from lsprotocol.types import (
 from pygls.server import LanguageServer
 from pygls.workspace import Document
 
+from .features.diagnostic import DiagnosticProvider
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from .parser import GAMESSParser
 from .tokenizer import tokenize_line
@@ -108,6 +109,9 @@ class DocumentCache:
 
 # Create document cache instance
 document_cache = DocumentCache()
+
+# Create diagnostic provider instance
+diagnostic_provider = DiagnosticProvider(server)
 
 
 def _is_valid_document_uri(uri: str) -> bool:
@@ -376,7 +380,7 @@ def _update_document(doc: Document) -> None:
     content = doc.source
     document_cache.set(doc.uri, content)
 
-    diagnostics = _get_diagnostics(content)
+    diagnostics = diagnostic_provider.get_diagnostics(content)
     server.publish_diagnostics(doc.uri, diagnostics)
 
 
@@ -539,7 +543,7 @@ def _get_word_at_position(line: str, character: int) -> str:
 def diagnostic(params: Any) -> List[Diagnostic]:
     """Handle diagnostic requests."""
     doc = server.workspace.get_text_document(params.text_document.uri)
-    return _get_diagnostics(doc.source)
+    return diagnostic_provider.get_diagnostics(doc.source)
 
 
 @server.feature("textDocument/formatting")
