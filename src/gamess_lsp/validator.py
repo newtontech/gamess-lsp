@@ -2,6 +2,11 @@
 
 This module provides physics/chemistry-aware validation that goes beyond
 syntax checking to detect semantically incorrect but syntactically valid inputs.
+
+Coverage note: This validator implements a safe, tested subset of GAMESS
+parameter constraints. It does NOT claim exhaustive scientific validation
+of all possible GAMESS input combinations. See the validation accuracy
+framework (tests/validation/) for measured coverage.
 """
 
 import re
@@ -50,7 +55,7 @@ class SemanticValidator:
         },
     }
 
-    # Method incompatibilities
+    # Method incompatibilities -- mutually exclusive post-HF / DFT methods
     METHOD_INCOMPATIBILITIES = [
         {
             "condition": lambda kws: kws.get("DFTTYP") and kws.get("MPLEVL") == "2",
@@ -69,6 +74,30 @@ class SemanticValidator:
             "message": "MP2 与 Coupled Cluster 不能同时使用。请选择 MPLEVL=2 或 CCTYP 其中之一。",
             "severity": "error",
             "code": "INCOMPAT_MP2_CC",
+        },
+        {
+            "condition": lambda kws: kws.get("MPLEVL") == "2" and kws.get("CITYP"),
+            "message": "MP2 与 CI 不能同时使用。MPLEVL=2 启用 MP2，CITYP 启用 CI 方法，二者互斥。",
+            "severity": "error",
+            "code": "INCOMPAT_MP2_CI",
+        },
+        {
+            "condition": lambda kws: kws.get("CCTYP") and kws.get("CITYP"),
+            "message": "Coupled Cluster 与 CI 不能同时使用。请选择 CCTYP 或 CITYP 其中之一。",
+            "severity": "error",
+            "code": "INCOMPAT_CC_CI",
+        },
+        {
+            "condition": lambda kws: kws.get("DFTTYP") and kws.get("CITYP"),
+            "message": "DFT 与 CI 不能同时使用。请选择 DFTTYP 或 CITYP 其中之一。",
+            "severity": "error",
+            "code": "INCOMPAT_DFT_CI",
+        },
+        {
+            "condition": lambda kws: kws.get("SCFTYP") == "ROHF" and kws.get("MPLEVL") == "2",
+            "message": "ROHF 与 MP2 不兼容。GAMESS 中 MP2 不支持 ROHF 参考。请使用 RHF 或 UHF。",
+            "severity": "error",
+            "code": "INCOMPAT_ROHF_MP2",
         },
         {
             "condition": lambda kws: kws.get("DFTTYP") and kws.get("SCFTYP") == "ROHF",
@@ -113,6 +142,36 @@ class SemanticValidator:
         },
     }
 
+    # Cross-group conflicts: groups that should not coexist
+    CROSS_GROUP_CONFLICTS = [
+        {
+            "group_a": "SCF",
+            "group_b": "MCSCF",
+            "condition": lambda kws: kws.get("SCFTYP") == "MCSCF",
+            "message": "$SCF 组与 $MCSCF 组不应同时出现。MCSCF 计算应使用 $MCSCF 组而非 $SCF 组。",
+            "severity": "warning",
+            "code": "CONFLICT_SCF_MCSCF",
+        },
+    ]
+
+    # RUNTYP values that are incompatible with certain method choices
+    RUNTYP_METHOD_CONSTRAINTS = [
+        {
+            "runtyp": "SURFACE",
+            "forbidden_kws": {"CCTYP": True},
+            "message": "RUNTYP=SURFACE 不支持 Coupled Cluster 计算。",
+            "severity": "error",
+            "code": "INCOMPAT_SURFACE_CC",
+        },
+        {
+            "runtyp": "DRC",
+            "forbidden_kws": {"MPLEVL": "2"},
+            "message": "RUNTYP=DRC (经典轨迹) 不支持 MP2 方法。DRC 需要 SCF 或 DFT 级别的势能面。",
+            "severity": "error",
+            "code": "INCOMPAT_DRC_MP2",
+        },
+    ]
+
     def validate(self, parsed_input: GAMESSInputFile) -> List[SemanticDiagnostic]:
         """Validate a parsed GAMESS input file.
 
@@ -142,6 +201,12 @@ class SemanticValidator:
 
         # 4. Validate required groups
         diagnostics.extend(self._validate_required_groups(parsed_input, contrl_kws))
+
+        # 5. Validate cross-group conflicts
+        diagnostics.extend(self._validate_cross_group_conflicts(parsed_input, contrl, contrl_kws))
+
+        # 6. Validate RUNTYP vs method constraints
+        diagnostics.extend(self._validate_runtyp_method(contrl, contrl_kws))
 
         return diagnostics
 
@@ -252,11 +317,11 @@ class SemanticValidator:
 
         # Check if electron count is consistent with multiplicity
         # Physics:
-        # - MULT=1 (singlet): 0 unpaired → even electrons
-        # - MULT=2 (doublet): 1 unpaired → odd electrons
-        # - MULT=3 (triplet): 2 unpaired → even electrons
-        # - MULT=4 (quartet): 3 unpaired → odd electrons
-        # Pattern: odd MULT → even electrons, even MULT → odd electrons
+        # - MULT=1 (singlet): 0 unpaired -> even electrons
+        # - MULT=2 (doublet): 1 unpaired -> odd electrons
+        # - MULT=3 (triplet): 2 unpaired -> even electrons
+        # - MULT=4 (quartet): 3 unpaired -> odd electrons
+        # Pattern: odd MULT -> even electrons, even MULT -> odd electrons
         # So: mult_mod_2 != electrons_mod_2 for valid combinations
         electrons_mod_2 = total_electrons % 2
         mult_mod_2 = mult % 2
@@ -336,6 +401,91 @@ class SemanticValidator:
                         )
                     )
                     break  # Only report once
+
+        return diagnostics
+
+    def _validate_cross_group_conflicts(
+        self, parsed_input: GAMESSInputFile, contrl: GAMESSGroup, contrl_kws: Dict[str, str]
+    ) -> List[SemanticDiagnostic]:
+        """Validate that conflicting groups are not present together."""
+        diagnostics = []
+
+        for rule in self.CROSS_GROUP_CONFLICTS:
+            group_a = parsed_input.get_group(rule["group_a"])
+            group_b = parsed_input.get_group(rule["group_b"])
+            if group_a and group_b:
+                # Additional condition check if present
+                if "condition" in rule and not rule["condition"](contrl_kws):
+                    continue
+                diagnostics.append(
+                    SemanticDiagnostic(
+                        line=contrl.line_start,
+                        message=rule["message"],
+                        severity=rule["severity"],
+                        code=rule["code"],
+                    )
+                )
+
+        # DFT group present but DFTTYP not set in CONTRL
+        dft_group = parsed_input.get_group("DFT")
+        if dft_group and not contrl_kws.get("DFTTYP"):
+            diagnostics.append(
+                SemanticDiagnostic(
+                    line=dft_group.line_start,
+                    message="存在 $DFT 组但未设置 DFTTYP。请在 $CONTRL 中设置 DFTTYP 以启用 DFT 计算。",
+                    severity="warning",
+                    code="DFT_GROUP_NO_DFTTYP",
+                )
+            )
+
+        # MP2 group present but MPLEVL not set to 2
+        mp2_group = parsed_input.get_group("MP2")
+        if mp2_group and contrl_kws.get("MPLEVL") != "2":
+            diagnostics.append(
+                SemanticDiagnostic(
+                    line=mp2_group.line_start,
+                    message="存在 $MP2 组但未设置 MPLEVL=2。请在 $CONTRL 中设置 MPLEVL=2 以启用 MP2 计算。",
+                    severity="warning",
+                    code="MP2_GROUP_NO_MPLEVL",
+                )
+            )
+
+        return diagnostics
+
+    def _validate_runtyp_method(
+        self, contrl: GAMESSGroup, contrl_kws: Dict[str, str]
+    ) -> List[SemanticDiagnostic]:
+        """Validate that RUNTYP is compatible with selected method."""
+        diagnostics = []
+
+        runtyp = contrl_kws.get("RUNTYP", "ENERGY")
+
+        for rule in self.RUNTYP_METHOD_CONSTRAINTS:
+            if runtyp != rule["runtyp"]:
+                continue
+            for kw_name, kw_value in rule["forbidden_kws"].items():
+                actual = contrl_kws.get(kw_name)
+                if actual is None:
+                    continue
+                if kw_value is True:
+                    # Any value triggers the conflict
+                    diagnostics.append(
+                        SemanticDiagnostic(
+                            line=contrl.line_start,
+                            message=rule["message"],
+                            severity=rule["severity"],
+                            code=rule["code"],
+                        )
+                    )
+                elif actual == kw_value:
+                    diagnostics.append(
+                        SemanticDiagnostic(
+                            line=contrl.line_start,
+                            message=rule["message"],
+                            severity=rule["severity"],
+                            code=rule["code"],
+                        )
+                    )
 
         return diagnostics
 
