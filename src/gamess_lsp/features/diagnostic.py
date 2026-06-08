@@ -21,6 +21,7 @@ from pygls.server import LanguageServer
 from ..keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from ..parser import GAMESSParser
 from ..validator import SemanticDiagnostic, validate_semantics
+from .typecheck import TypecheckProvider
 
 _DIAGNOSTIC_SOURCE = "gamess-lsp"
 
@@ -146,6 +147,10 @@ class DiagnosticProvider:
         # 3. Keyword-level validation against known keywords
         self._validate_keywords(parsed_input, diagnostics)
 
+
+        # 4. Typecheck diagnostics (enum, type, required sections)
+        typecheck_provider = TypecheckProvider()
+        diagnostics.extend(typecheck_provider.validate(parsed_input))
         return diagnostics
 
     def _validate_keywords(
