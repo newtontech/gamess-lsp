@@ -1,0 +1,6 @@
+{
+  "description": "Valid DFT B3LYP optimization",
+  "input": " $CONTRL SCFTYP=RHF DFTTYP=B3LYP RUNTYP=OPTIMIZE $END\n $BASIS GBASIS=CC-PVDZ $END\n $STATPT OPTTOL=0.0001 NSTEP=50 $END\n $DATA\nWater\nC1\nO     8.0   0.0   0.0   0.0\nH     1.0   0.7   0.7   0.0\nH     1.0  -0.7   0.7   0.0\n $END\n",
+  "expected_diagnostics": [],
+  "category": "valid_inputs"
+}

@@ -1,0 +1,11 @@
+{
+  "description": "DFTTYP and CCTYP are mutually exclusive",
+  "input": " $CONTRL SCFTYP=RHF DFTTYP=B3LYP CCTYP=CCSD(T) RUNTYP=ENERGY $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "INCOMPAT_DFT_CC",
+      "severity": "error"
+    }
+  ],
+  "category": "mutually_exclusive"
+}

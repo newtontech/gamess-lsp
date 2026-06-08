@@ -1,0 +1,11 @@
+{
+  "description": "UHF with CC is a warning",
+  "input": " $CONTRL SCFTYP=UHF CCTYP=CCSD(T) RUNTYP=ENERGY $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "WARN_UHF_CC",
+      "severity": "warning"
+    }
+  ],
+  "category": "invalid_combinations"
+}

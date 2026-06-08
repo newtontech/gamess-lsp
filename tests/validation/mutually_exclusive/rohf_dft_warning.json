@@ -1,0 +1,11 @@
+{
+  "description": "ROHF-DFT is not recommended (warning)",
+  "input": " $CONTRL SCFTYP=ROHF DFTTYP=B3LYP RUNTYP=ENERGY $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nTest\nC1\nO     8.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "WARN_ROHF_DFT",
+      "severity": "warning"
+    }
+  ],
+  "category": "mutually_exclusive"
+}

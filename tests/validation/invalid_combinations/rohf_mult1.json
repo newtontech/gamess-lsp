@@ -1,0 +1,11 @@
+{
+  "description": "ROHF with MULT=1 is invalid",
+  "input": " $CONTRL SCFTYP=ROHF MULT=1 RUNTYP=ENERGY $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "SCFTYP_MULT_INCOMPAT",
+      "severity": "error"
+    }
+  ],
+  "category": "invalid_combinations"
+}

@@ -1,0 +1,11 @@
+{
+  "description": "RUNTYP=IRC without $IRC group",
+  "input": " $CONTRL SCFTYP=RHF RUNTYP=IRC $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "MISSING_IRC",
+      "severity": "error"
+    }
+  ],
+  "category": "runtyp_constraints"
+}

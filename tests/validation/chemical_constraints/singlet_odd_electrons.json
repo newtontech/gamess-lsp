@@ -1,0 +1,11 @@
+{
+  "description": "Singlet with odd electron count",
+  "input": " $CONTRL SCFTYP=UHF MULT=1 RUNTYP=ENERGY $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nH atom\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "ELECTRON_MULT_MISMATCH",
+      "severity": "error"
+    }
+  ],
+  "category": "chemical_constraints"
+}
