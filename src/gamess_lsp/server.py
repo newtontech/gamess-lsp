@@ -43,6 +43,7 @@ from pygls.server import LanguageServer
 from pygls.workspace import Document
 
 from .features.diagnostic import DiagnosticProvider
+from .features.lint import LintProvider
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from .parser import GAMESSParser
 from .tokenizer import tokenize_line
@@ -112,6 +113,7 @@ document_cache = DocumentCache()
 
 # Create diagnostic provider instance
 diagnostic_provider = DiagnosticProvider(server)
+lint_provider = LintProvider(server)
 
 
 def _is_valid_document_uri(uri: str) -> bool:
@@ -381,6 +383,8 @@ def _update_document(doc: Document) -> None:
     document_cache.set(doc.uri, content)
 
     diagnostics = diagnostic_provider.get_diagnostics(content)
+    lint_diagnostics = lint_provider.lint(content)
+    diagnostics.extend(lint_diagnostics)
     server.publish_diagnostics(doc.uri, diagnostics)
 
 
