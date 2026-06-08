@@ -1,0 +1,11 @@
+{
+  "description": "DFTTYP and MPLEVL=2 are mutually exclusive",
+  "input": " $CONTRL SCFTYP=RHF DFTTYP=B3LYP MPLEVL=2 RUNTYP=ENERGY $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "INCOMPAT_DFT_MP2",
+      "severity": "error"
+    }
+  ],
+  "category": "mutually_exclusive"
+}

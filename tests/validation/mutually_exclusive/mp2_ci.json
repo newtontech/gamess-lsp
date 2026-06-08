@@ -1,0 +1,11 @@
+{
+  "description": "MPLEVL=2 and CITYP are mutually exclusive",
+  "input": " $CONTRL MPLEVL=2 CITYP=GUGA RUNTYP=ENERGY $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "INCOMPAT_MP2_CI",
+      "severity": "error"
+    }
+  ],
+  "category": "mutually_exclusive"
+}

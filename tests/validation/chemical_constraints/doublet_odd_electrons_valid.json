@@ -1,0 +1,6 @@
+{
+  "description": "Doublet with odd electrons valid",
+  "input": " $CONTRL SCFTYP=UHF MULT=2 RUNTYP=ENERGY $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nH atom\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [],
+  "category": "chemical_constraints"
+}

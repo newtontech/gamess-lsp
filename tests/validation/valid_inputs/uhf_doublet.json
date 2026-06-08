@@ -1,0 +1,6 @@
+{
+  "description": "Valid UHF doublet radical",
+  "input": " $CONTRL SCFTYP=UHF MULT=2 RUNTYP=ENERGY $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nCH3 radical\nC1\nC     6.0   0.0   0.0   0.0\nH     1.0   0.0   1.089  0.0\nH     1.0   1.027 -0.363  0.0\nH     1.0  -1.027 -0.363  0.0\n $END\n",
+  "expected_diagnostics": [],
+  "category": "valid_inputs"
+}

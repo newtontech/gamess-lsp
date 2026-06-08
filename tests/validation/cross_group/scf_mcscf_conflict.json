@@ -1,0 +1,11 @@
+{
+  "description": "$SCF and $MCSCF with SCFTYP=MCSCF",
+  "input": " $CONTRL SCFTYP=MCSCF RUNTYP=ENERGY $END\n $SCF DIRSCF=.TRUE. $END\n $MCSCF CISTEP=ALDET $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "CONFLICT_SCF_MCSCF",
+      "severity": "warning"
+    }
+  ],
+  "category": "cross_group"
+}

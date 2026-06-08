@@ -1,0 +1,11 @@
+{
+  "description": "MPLEVL=2 and CCTYP are mutually exclusive",
+  "input": " $CONTRL SCFTYP=RHF MPLEVL=2 CCTYP=CCSD(T) RUNTYP=ENERGY $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\nH     1.0   0.0   0.74  0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "INCOMPAT_MP2_CC",
+      "severity": "error"
+    }
+  ],
+  "category": "mutually_exclusive"
+}

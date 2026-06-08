@@ -1,0 +1,11 @@
+{
+  "description": "RUNTYP=SURFACE with CCTYP",
+  "input": " $CONTRL SCFTYP=RHF CCTYP=CCSD(T) RUNTYP=SURFACE $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "INCOMPAT_SURFACE_CC",
+      "severity": "error"
+    }
+  ],
+  "category": "runtyp_constraints"
+}

@@ -1,0 +1,6 @@
+{
+  "description": "Charged cation valid",
+  "input": " $CONTRL SCFTYP=UHF ICHARG=1 MULT=2 RUNTYP=ENERGY $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nH2+ cation\nC1\nH     1.0   0.0   0.0   0.0\nH     1.0   0.0   0.74  0.0\n $END\n",
+  "expected_diagnostics": [],
+  "category": "chemical_constraints"
+}

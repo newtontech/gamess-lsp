@@ -1,0 +1,11 @@
+{
+  "description": "DFTTYP and CITYP are mutually exclusive",
+  "input": " $CONTRL DFTTYP=B3LYP CITYP=CIS RUNTYP=ENERGY $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "INCOMPAT_DFT_CI",
+      "severity": "error"
+    }
+  ],
+  "category": "mutually_exclusive"
+}

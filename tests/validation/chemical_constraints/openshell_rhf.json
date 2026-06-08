@@ -1,0 +1,11 @@
+{
+  "description": "Open-shell with RHF",
+  "input": " $CONTRL SCFTYP=RHF MULT=2 RUNTYP=ENERGY $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nH atom\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "OPEN_SHELL_RHF",
+      "severity": "error"
+    }
+  ],
+  "category": "chemical_constraints"
+}

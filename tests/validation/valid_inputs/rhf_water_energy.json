@@ -1,0 +1,6 @@
+{
+  "description": "Valid RHF water energy",
+  "input": " $CONTRL SCFTYP=RHF MULT=1 RUNTYP=ENERGY $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nWater\nC1\nO     8.0   0.0   0.0   0.0\nH     1.0   0.7   0.7   0.0\nH     1.0  -0.7   0.7   0.0\n $END\n",
+  "expected_diagnostics": [],
+  "category": "valid_inputs"
+}

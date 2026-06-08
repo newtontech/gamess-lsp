@@ -1,0 +1,11 @@
+{
+  "description": "ROHF with MP2 is invalid",
+  "input": " $CONTRL SCFTYP=ROHF MPLEVL=2 RUNTYP=ENERGY $END\n $BASIS GBASIS=CC-PVDZ $END\n $DATA\nTest\nC1\nO     8.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "INCOMPAT_ROHF_MP2",
+      "severity": "error"
+    }
+  ],
+  "category": "invalid_combinations"
+}

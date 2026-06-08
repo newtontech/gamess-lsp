@@ -1,0 +1,11 @@
+{
+  "description": "RUNTYP=DRC with MPLEVL=2",
+  "input": " $CONTRL SCFTYP=RHF MPLEVL=2 RUNTYP=DRC $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "INCOMPAT_DRC_MP2",
+      "severity": "error"
+    }
+  ],
+  "category": "runtyp_constraints"
+}

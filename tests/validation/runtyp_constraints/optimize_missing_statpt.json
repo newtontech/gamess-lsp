@@ -1,0 +1,11 @@
+{
+  "description": "RUNTYP=OPTIMIZE without $STATPT",
+  "input": " $CONTRL SCFTYP=RHF RUNTYP=OPTIMIZE $END\n $BASIS GBASIS=STO NGAUSS=3 $END\n $DATA\nTest\nC1\nH     1.0   0.0   0.0   0.0\nH     1.0   0.0   0.74  0.0\n $END\n",
+  "expected_diagnostics": [
+    {
+      "code": "MISSING_STATPT",
+      "severity": "warning"
+    }
+  ],
+  "category": "runtyp_constraints"
+}
