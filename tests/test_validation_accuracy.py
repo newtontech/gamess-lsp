@@ -1,7 +1,5 @@
 """Validation accuracy tests — behavior-oriented test suite for GAMESS LSP diagnostics."""
 
-import pytest
-
 from gamess_lsp.parser import GAMESSParser, parse_gamess_input
 from gamess_lsp.validator import validate_semantics
 
