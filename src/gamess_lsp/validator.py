@@ -4,9 +4,8 @@ This module provides physics/chemistry-aware validation that goes beyond
 syntax checking to detect semantically incorrect but syntactically valid inputs.
 """
 
-import re
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from .constants import ELEMENT_ATOMIC_NUMBERS
 from .parser import GAMESSGroup, GAMESSInputFile
@@ -174,7 +173,7 @@ class SemanticValidator:
                 SemanticDiagnostic(
                     line=line,
                     message=f"SCFTYP={scftyp} 不支持 MULT={mult}。{constraint['description']}"
-                    + (f"\n建议：对于开壳层体系，使用 UHF 或 ROHF。" if scftyp == "RHF" else ""),
+                    + ("\n建议：对于开壳层体系，使用 UHF 或 ROHF。" if scftyp == "RHF" else ""),
                     severity="error",
                     code="SCFTYP_MULT_INCOMPAT",
                 )
