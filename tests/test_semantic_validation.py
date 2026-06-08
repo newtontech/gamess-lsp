@@ -1,9 +1,7 @@
 """Tests for semantic validation."""
 
-import pytest
-
 from gamess_lsp.parser import GAMESSParser
-from gamess_lsp.validator import SemanticValidator, validate_semantics
+from gamess_lsp.validator import validate_semantics
 
 
 class TestSCFTYPMultValidation:
