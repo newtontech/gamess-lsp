@@ -22,6 +22,7 @@ from lsprotocol.types import (
     DidChangeTextDocumentParams,
     DidOpenTextDocumentParams,
     DocumentFormattingParams,
+    DocumentRangeFormattingParams,
     DocumentSymbolParams,
     Hover,
     HoverParams,
@@ -43,6 +44,7 @@ from pygls.server import LanguageServer
 from pygls.workspace import Document
 
 from .features.diagnostic import DiagnosticProvider
+from .features.formatting import FormattingProvider
 from .features.typecheck import TypecheckProvider
 from .features.lint import LintProvider
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
@@ -115,6 +117,7 @@ document_cache = DocumentCache()
 # Create diagnostic provider instance
 diagnostic_provider = DiagnosticProvider(server)
 lint_provider = LintProvider(server)
+formatting_provider = FormattingProvider(server)
 
 
 def _is_valid_document_uri(uri: str) -> bool:
@@ -559,77 +562,21 @@ def diagnostic(params: Any) -> List[Diagnostic]:
 def formatting(params: DocumentFormattingParams) -> List[TextEdit]:
     """Handle document formatting requests."""
     doc = server.workspace.get_text_document(params.text_document.uri)
-    content = doc.source
-    lines = content.split("\n")
+    return formatting_provider.format_document(doc.source, params)
 
-    formatted_lines = []
-    in_group = False
-    indent = "  "
 
-    for line in lines:
-        stripped = line.strip()
-
-        if not stripped:
-            formatted_lines.append("")
-            continue
-
-        if stripped.startswith("!"):
-            formatted_lines.append(stripped)
-            continue
-
-        if stripped.startswith("$") and not re.match(r"^\$END\b", stripped, re.IGNORECASE):
-            match = re.match(r"^\$([A-Za-z_][A-Za-z0-9_]*)\s*(.*)", stripped)
-            if match:
-                group_name = match.group(1).upper()
-                rest = match.group(2).strip()
-
-                if rest and not rest.startswith("$"):
-                    formatted_lines.append(f"${group_name}")
-                    in_group = True
-                    keywords = _format_keywords(rest)
-                    formatted_lines.append(f"{indent}{keywords}")
-                else:
-                    formatted_lines.append(f"${group_name}")
-                    in_group = True
-
-                    if rest.upper().startswith("$END"):
-                        in_group = False
-                        formatted_lines.append("$END")
-        elif re.match(r"^\$END\b", stripped, re.IGNORECASE):
-            in_group = False
-            formatted_lines.append("$END")
-        elif in_group:
-            if "=" in stripped and not stripped.startswith("!"):
-                formatted_keywords = _format_keywords(stripped)
-                formatted_lines.append(f"{indent}{formatted_keywords}")
-            else:
-                formatted_lines.append(f"{indent}{stripped}")
-        else:
-            formatted_lines.append(stripped)
-
-    return [
-        TextEdit(
-            range=Range(
-                start=Position(line=0, character=0), end=Position(line=len(lines), character=0)
-            ),
-            new_text="\n".join(formatted_lines),
-        )
-    ]
+@server.feature("textDocument/rangeFormatting")
+def range_formatting(params: DocumentRangeFormattingParams) -> List[TextEdit]:
+    """Handle range formatting requests."""
+    doc = server.workspace.get_text_document(params.text_document.uri)
+    return formatting_provider.format_range(doc.source, params)
 
 
 def _format_keywords(line: str) -> str:
     """Format a line of keyword=value pairs."""
-    tokens = tokenize_line(line)
+    from .features.formatting import GamessFormattingProvider
 
-    formatted_tokens = []
-    for token in tokens:
-        if "=" in token:
-            key, value = token.split("=", 1)
-            formatted_tokens.append(f"{key.strip()}={value.strip()}")
-        else:
-            formatted_tokens.append(token.strip())
-
-    return " ".join(formatted_tokens)
+    return GamessFormattingProvider._format_keywords(line)
 
 
 @server.feature("textDocument/documentSymbol")
