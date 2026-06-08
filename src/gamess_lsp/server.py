@@ -47,6 +47,13 @@ from .features.diagnostic import DiagnosticProvider
 from .features.formatting import FormattingProvider
 from .features.typecheck import TypecheckProvider
 from .features.lint import LintProvider
+from .features.navigation import (
+    DefinitionProvider as NavDefinitionProvider,
+    HoverProvider as NavHoverProvider,
+    ReferencesProvider as NavReferencesProvider,
+    SymbolIndex,
+    _extract_word,
+)
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from .parser import GAMESSParser
 from .tokenizer import tokenize_line
@@ -118,6 +125,11 @@ document_cache = DocumentCache()
 diagnostic_provider = DiagnosticProvider(server)
 lint_provider = LintProvider(server)
 formatting_provider = FormattingProvider(server)
+
+# Navigation providers (definition, hover, references)
+_nav_definition = NavDefinitionProvider()
+_nav_hover = NavHoverProvider()
+_nav_references = NavReferencesProvider()
 
 
 def _is_valid_document_uri(uri: str) -> bool:
@@ -509,46 +521,17 @@ def completion(params: CompletionParams) -> CompletionList:
 
 @server.feature("textDocument/hover")
 def hover(params: HoverParams) -> Optional[Hover]:
-    """Handle hover requests."""
+    """Handle hover requests using the navigation provider."""
     doc = server.workspace.get_text_document(params.text_document.uri)
-    position = params.position
-
-    line = doc.lines[position.line]
-    word = _get_word_at_position(line, position.character)
-
-    if not word:
-        return None
-
-    word_upper = word.upper()
-
-    if word_upper in GAMESS_GROUPS:
-        return Hover(contents=GAMESS_GROUPS[word_upper])
-
-    parser = GAMESSParser()
-    current_group = parser.get_group_at_position(doc.source, position.line + 1)
-
-    if current_group and current_group in GAMESS_KEYWORDS:
-        if word_upper in GAMESS_KEYWORDS[current_group]:
-            info = GAMESS_KEYWORDS[current_group][word_upper]
-            return Hover(contents=f"**{word}**\n\n{info.get('doc', 'No documentation available')}")
-
-    return None
+    return _nav_hover.get_hover(doc.source, params.position)
 
 
 def _get_word_at_position(line: str, character: int) -> str:
-    """Get the word at a character position."""
-    if not line or character >= len(line):
-        return ""
+    """Get the word at a character position.
 
-    start = character
-    while start > 0 and line[start - 1].isalnum():
-        start -= 1
-
-    end = character
-    while end < len(line) and line[end].isalnum():
-        end += 1
-
-    return line[start:end]
+    Delegates to the navigation module's ``_extract_word`` for consistency.
+    """
+    return _extract_word(line, character)
 
 
 @server.feature("textDocument/diagnostic")
@@ -581,185 +564,109 @@ def _format_keywords(line: str) -> str:
 
 @server.feature("textDocument/documentSymbol")
 def document_symbol(params: DocumentSymbolParams) -> List[SymbolInformation]:
-    """Handle document symbol requests."""
+    """Handle document symbol requests using the shared symbol index."""
     doc = server.workspace.get_text_document(params.text_document.uri)
     content = doc.source
 
-    symbols = []
+    index = SymbolIndex()
+    index.build(content, params.text_document.uri)
 
-    parser = GAMESSParser()
-    parsed = parser.parse(content)
+    symbols: List[SymbolInformation] = []
 
-    for group_name, group in parsed.groups.items():
-        symbol = SymbolInformation(
-            name=f"${group_name}",
-            kind=SymbolKind.Class,
-            location=Location(
-                uri=params.text_document.uri,
-                range=Range(
-                    start=Position(line=group.line_start - 1, character=0),
-                    end=Position(line=group.line_end - 1, character=0),
-                ),
-            ),
-        )
-        symbols.append(symbol)
+    for sym in index.symbols:
+        if sym.kind == "section":
+            kind = SymbolKind.Class
+        elif sym.kind == "keyword":
+            kind = SymbolKind.Property
+        elif sym.kind == "variable":
+            kind = SymbolKind.Variable
+        else:
+            kind = SymbolKind.File
 
-        for keyword_name, keyword in group.keywords.items():
-            kw_symbol = SymbolInformation(
-                name=keyword_name,
-                kind=SymbolKind.Property,
+        name = sym.name
+        if sym.kind == "section":
+            name = f"${sym.name}"
+
+        symbols.append(
+            SymbolInformation(
+                name=name,
+                kind=kind,
                 location=Location(
                     uri=params.text_document.uri,
                     range=Range(
-                        start=Position(line=keyword.line_number - 1, character=0),
-                        end=Position(line=keyword.line_number - 1, character=100),
+                        start=Position(line=sym.line, character=sym.character),
+                        end=Position(line=sym.line, character=sym.end_character),
                     ),
                 ),
-                container_name=f"${group_name}",
+                container_name=f"${sym.group_name}" if sym.group_name and sym.kind != "section" else None,
             )
-            symbols.append(kw_symbol)
+        )
 
     return symbols
 
 
 @server.feature("workspace/symbol")
 def workspace_symbol(params: WorkspaceSymbolParams) -> List[SymbolInformation]:
-    """Handle workspace symbol requests."""
+    """Handle workspace symbol requests using the shared symbol index."""
     query = params.query.upper() if params.query else ""
     symbols: List[SymbolInformation] = []
 
     for uri, content in document_cache.items():
-        parser = GAMESSParser()
-        parsed = parser.parse(content)
+        index = SymbolIndex()
+        index.build(content, uri)
 
-        for group_name, group in parsed.groups.items():
-            if not query or query in group_name:
-                symbol = SymbolInformation(
-                    name=f"${group_name}",
-                    kind=SymbolKind.Class,
-                    location=Location(
-                        uri=uri,
-                        range=Range(
-                            start=Position(line=group.line_start - 1, character=0),
-                            end=Position(line=group.line_end - 1, character=0),
-                        ),
-                    ),
-                )
-                symbols.append(symbol)
+        for sym in index.symbols:
+            if not query or query in sym.name.upper():
+                if sym.kind == "section":
+                    kind = SymbolKind.Class
+                elif sym.kind == "keyword":
+                    kind = SymbolKind.Property
+                elif sym.kind == "variable":
+                    kind = SymbolKind.Variable
+                else:
+                    kind = SymbolKind.File
 
-            for keyword_name, keyword in group.keywords.items():
-                if not query or query in keyword_name:
-                    kw_symbol = SymbolInformation(
-                        name=keyword_name,
-                        kind=SymbolKind.Property,
+                name = sym.name
+                if sym.kind == "section":
+                    name = f"${sym.name}"
+
+                symbols.append(
+                    SymbolInformation(
+                        name=name,
+                        kind=kind,
                         location=Location(
                             uri=uri,
                             range=Range(
-                                start=Position(line=keyword.line_number - 1, character=0),
-                                end=Position(line=keyword.line_number - 1, character=100),
+                                start=Position(line=sym.line, character=sym.character),
+                                end=Position(line=sym.line, character=sym.end_character),
                             ),
                         ),
-                        container_name=f"${group_name}",
+                        container_name=f"${sym.group_name}" if sym.group_name and sym.kind != "section" else None,
                     )
-                    symbols.append(kw_symbol)
+                )
 
     return symbols
 
 
 @server.feature("textDocument/definition")
 def definition(params: DefinitionParams) -> Optional[List[Location]]:
-    """Handle go to definition requests."""
+    """Handle go to definition requests using the navigation provider."""
     doc = server.workspace.get_text_document(params.text_document.uri)
-    content = doc.source
-    position = params.position
-
-    line = doc.lines[position.line]
-    word = _get_word_at_position(line, position.character)
-
-    if not word:
-        return None
-
-    word_upper = word.upper()
-    parser = GAMESSParser()
-    parsed = parser.parse(content)
-
-    locations: List[Location] = []
-
-    if word_upper in parsed.groups:
-        group = parsed.groups[word_upper]
-        locations.append(
-            Location(
-                uri=params.text_document.uri,
-                range=Range(
-                    start=Position(line=group.line_start - 1, character=0),
-                    end=Position(line=group.line_start - 1, character=len(f"${word_upper}")),
-                ),
-            )
-        )
-        return locations
-
-    current_group = parser.get_group_at_position(content, position.line + 1)
-    if current_group:
-        current_group_obj = parsed.get_group(current_group)
-        if current_group_obj and word_upper in current_group_obj.keywords:
-            keyword = current_group_obj.keywords[word_upper]
-            locations.append(
-                Location(
-                    uri=params.text_document.uri,
-                    range=Range(
-                        start=Position(line=keyword.line_number - 1, character=0),
-                        end=Position(line=keyword.line_number - 1, character=100),
-                    ),
-                )
-            )
-            return locations
-
-    return None
+    return _nav_definition.get_definition(doc.source, params.text_document.uri, params.position)
 
 
 @server.feature("textDocument/references")
 def references(params: ReferenceParams) -> Optional[List[Location]]:
-    """Handle find references requests."""
+    """Handle find references requests using the navigation provider."""
     doc = server.workspace.get_text_document(params.text_document.uri)
-    content = doc.source
-    position = params.position
-
-    line = doc.lines[position.line]
-    word = _get_word_at_position(line, position.character)
-
-    if not word:
-        return None
-
-    word_upper = word.upper()
-    # Security: Escape regex special characters in user input
-    escaped_word = re.escape(word_upper)
-
-    locations: List[Location] = []
-    lines = content.split("\n")
-
-    for i, line_content in enumerate(lines):
-        if re.search(rf"\\${escaped_word}\b", line_content, re.IGNORECASE):
-            locations.append(
-                Location(
-                    uri=params.text_document.uri,
-                    range=Range(
-                        start=Position(line=i, character=0),
-                        end=Position(line=i, character=len(line_content)),
-                    ),
-                )
-            )
-        elif re.search(rf"\b{escaped_word}\s*=", line_content, re.IGNORECASE):
-            locations.append(
-                Location(
-                    uri=params.text_document.uri,
-                    range=Range(
-                        start=Position(line=i, character=0),
-                        end=Position(line=i, character=len(line_content)),
-                    ),
-                )
-            )
-
-    return locations if locations else None
+    include_declaration = getattr(params.context, "include_declaration", True)
+    locs = _nav_references.get_references(
+        doc.source,
+        params.text_document.uri,
+        params.position,
+        include_declaration=include_declaration,
+    )
+    return locs if locs else None
 
 
 @server.feature("textDocument/codeAction")
