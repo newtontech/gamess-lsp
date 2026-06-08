@@ -7,6 +7,32 @@ on:
     branches: [ main, master ]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    - name: Install dependencies
+      run: |
+        uv sync --all-extras --dev
+
+    - name: Run flake8
+      run: |
+        uv run flake8 src/ tests/ --max-line-length=100 --extend-ignore=E203,W503
+
+    - name: Run bandit
+      run: |
+        uv run bandit -r src/
+
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -32,11 +58,6 @@ jobs:
     - name: Run tests
       run: |
         uv run pytest tests/ -v --cov=src --cov-report=xml
-
-    - name: Run security scan
-      run: |
-        uv run bandit -r src/ -f json -o bandit-report.json || true
-        uv run bandit -r src/
 
     - name: Upload coverage
       uses: codecov/codecov-action@v4
