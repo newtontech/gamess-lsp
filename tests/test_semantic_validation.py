@@ -362,3 +362,275 @@ H     1.0   0.0   0.74  0.0
         # MULT=2 is correct for 1 unpaired electron
         codes = [d.code for d in diagnostics]
         assert "ELECTRON_MULT_MISMATCH" not in codes
+
+
+class TestMutualExclusivity:
+    """Tests for mutually exclusive parameter detection (issue #6)."""
+
+    def test_mp2_with_ci_is_error(self):
+        """MPLEVL=2 with CITYP is incompatible."""
+        content = """
+ $CONTRL MPLEVL=2 CITYP=GUGA RUNTYP=ENERGY $END
+ $BASIS GBASIS=STO NGAUSS=3 $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "INCOMPAT_MP2_CI" in codes
+
+        diag = next(d for d in diagnostics if d.code == "INCOMPAT_MP2_CI")
+        assert diag.severity == "error"
+
+    def test_cc_with_ci_is_error(self):
+        """CCTYP with CITYP is incompatible."""
+        content = """
+ $CONTRL CCTYP=CCSD(T) CITYP=GUGA RUNTYP=ENERGY $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "INCOMPAT_CC_CI" in codes
+
+    def test_dft_with_ci_is_error(self):
+        """DFTTYP with CITYP is incompatible."""
+        content = """
+ $CONTRL DFTTYP=B3LYP CITYP=CIS RUNTYP=ENERGY $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "INCOMPAT_DFT_CI" in codes
+
+    def test_rohf_with_mp2_is_error(self):
+        """ROHF reference is incompatible with MP2."""
+        content = """
+ $CONTRL SCFTYP=ROHF MPLEVL=2 RUNTYP=ENERGY $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DATA
+Test
+C1
+O     8.0   0.0   0.0   0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "INCOMPAT_ROHF_MP2" in codes
+
+        diag = next(d for d in diagnostics if d.code == "INCOMPAT_ROHF_MP2")
+        assert diag.severity == "error"
+
+    def test_valid_mp2_calculation_no_ci(self):
+        """Valid MP2 calculation without CI should pass."""
+        content = """
+ $CONTRL SCFTYP=RHF MPLEVL=2 RUNTYP=ENERGY $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+H     1.0   0.0   0.74  0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "INCOMPAT_MP2_CI" not in codes
+        assert "INCOMPAT_ROHF_MP2" not in codes
+
+    def test_valid_ci_calculation(self):
+        """Valid CI calculation without post-HF should pass."""
+        content = """
+ $CONTRL SCFTYP=RHF CITYP=CIS RUNTYP=ENERGY $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+H     1.0   0.0   0.74  0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        # No post-HF conflict errors
+        conflict_codes = [c for c in ["INCOMPAT_MP2_CI", "INCOMPAT_CC_CI", "INCOMPAT_DFT_CI"]
+                          if c in [d.code for d in diagnostics]]
+        assert len(conflict_codes) == 0
+
+
+class TestCrossGroupConflicts:
+    """Tests for cross-group conflict detection (issue #6)."""
+
+    def test_scf_and_mcscf_groups_conflict(self):
+        """Both $SCF and $MCSCF groups present with SCFTYP=MCSCF triggers warning."""
+        content = """
+ $CONTRL SCFTYP=MCSCF RUNTYP=ENERGY $END
+ $SCF DIRSCF=.TRUE. $END
+ $MCSCF CISTEP=ALDET $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "CONFLICT_SCF_MCSCF" in codes
+
+    def test_dft_group_without_dfttyp(self):
+        """$DFT group present without DFTTYP in CONTRL triggers warning."""
+        content = """
+ $CONTRL SCFTYP=RHF RUNTYP=ENERGY $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DFT NRAD=96 NLEB=302 $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+H     1.0   0.0   0.74  0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "DFT_GROUP_NO_DFTTYP" in codes
+
+        diag = next(d for d in diagnostics if d.code == "DFT_GROUP_NO_DFTTYP")
+        assert diag.severity == "warning"
+
+    def test_mp2_group_without_mplevl(self):
+        """$MP2 group present without MPLEVL=2 in CONTRL triggers warning."""
+        content = """
+ $CONTRL SCFTYP=RHF RUNTYP=ENERGY $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $MP2 NACORE=0 $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+H     1.0   0.0   0.74  0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "MP2_GROUP_NO_MPLEVL" in codes
+
+        diag = next(d for d in diagnostics if d.code == "MP2_GROUP_NO_MPLEVL")
+        assert diag.severity == "warning"
+
+    def test_dft_group_with_dfttyp_is_valid(self):
+        """$DFT group with DFTTYP set should not warn."""
+        content = """
+ $CONTRL SCFTYP=RHF DFTTYP=B3LYP RUNTYP=ENERGY $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DFT NRAD=96 NLEB=302 $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+H     1.0   0.0   0.74  0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "DFT_GROUP_NO_DFTTYP" not in codes
+
+
+class TestRuntypMethodConstraints:
+    """Tests for RUNTYP vs method compatibility (issue #6)."""
+
+    def test_surface_with_cc_is_error(self):
+        """RUNTYP=SURFACE with CCTYP is incompatible."""
+        content = """
+ $CONTRL SCFTYP=RHF CCTYP=CCSD(T) RUNTYP=SURFACE $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "INCOMPAT_SURFACE_CC" in codes
+
+    def test_drc_with_mp2_is_error(self):
+        """RUNTYP=DRC with MPLEVL=2 is incompatible."""
+        content = """
+ $CONTRL SCFTYP=RHF MPLEVL=2 RUNTYP=DRC $END
+ $BASIS GBASIS=STO NGAUSS=3 $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "INCOMPAT_DRC_MP2" in codes
+
+    def test_surface_without_cc_is_valid(self):
+        """RUNTYP=SURFACE without CC methods is valid."""
+        content = """
+ $CONTRL SCFTYP=RHF RUNTYP=SURFACE $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $SURFACE NSURF=10 $END
+ $DATA
+Test
+C1
+H     1.0   0.0   0.0   0.0
+ $END
+"""
+        parser = GAMESSParser()
+        parsed = parser.parse(content)
+        diagnostics = validate_semantics(parsed)
+
+        codes = [d.code for d in diagnostics]
+        assert "INCOMPAT_SURFACE_CC" not in codes
