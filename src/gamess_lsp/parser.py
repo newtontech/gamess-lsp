@@ -133,7 +133,6 @@ class GAMESSParser:
         lines = content.split("\n")
 
         current_group: Optional[GAMESSGroup] = None
-        in_data_group = False
         data_line_count = 0  # Track lines within $DATA for title/symmetry skip
         geometry_lines: List[Tuple[int, str]] = []
 
@@ -152,7 +151,6 @@ class GAMESSParser:
                         current_group.line_end = line_num
                         result.add_group(current_group)
                         if current_group.name == "DATA":
-                            in_data_group = False
                             data_line_count = 0
                         current_group = None
                     continue
@@ -172,7 +170,6 @@ class GAMESSParser:
 
                     # Track if we're entering $DATA group
                     if group_name == "DATA":
-                        in_data_group = True
                         data_line_count = 0
 
                     # Parse keywords in this line (after the group name)
