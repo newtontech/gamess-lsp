@@ -1,0 +1,11 @@
+! Unknown keyword in a known group
+ $CONTRL SCFTYP=RHF RUNTYP=ENERGY BADKEY=SOMETHING $END
+ $SYSTEM MWORDS=100 $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DATA
+Water
+C1
+
+O     8.0   0.0   0.0   0.0
+H     1.0   0.96   0.0   0.0
+ $END

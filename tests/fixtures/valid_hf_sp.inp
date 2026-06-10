@@ -1,0 +1,10 @@
+! HF single point - He atom
+ $CONTRL SCFTYP=RHF RUNTYP=ENERGY $END
+ $SYSTEM MWORDS=50 $END
+ $BASIS GBASIS=STO NGAUSS=3 $END
+ $DATA
+He atom
+C1
+
+He     2.0   0.0   0.0   0.0
+ $END

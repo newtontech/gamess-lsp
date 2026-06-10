@@ -1,0 +1,11 @@
+! Invalid SCFTYP value
+ $CONTRL SCFTYP=INVALID RUNTYP=ENERGY $END
+ $SYSTEM MWORDS=100 $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $DATA
+Water
+C1
+
+O     8.0   0.0   0.0   0.0
+H     1.0   0.96   0.0   0.0
+ $END

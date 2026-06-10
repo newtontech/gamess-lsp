@@ -1,0 +1,10 @@
+! RHF with multiplicity=2 (open shell)
+ $CONTRL SCFTYP=RHF RUNTYP=ENERGY MULT=2 $END
+ $SYSTEM MWORDS=100 $END
+ $DATA
+OH radical
+C1
+
+O     8.0   0.0   0.0   0.0
+H     1.0   0.96   0.0   0.0
+ $END
