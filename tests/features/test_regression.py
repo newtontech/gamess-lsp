@@ -1,6 +1,6 @@
-import json, pytest
-from lsprotocol.types import Diagnostic, DiagnosticSeverity, Position, Range
-from gamess_lsp.features.regression import GoldenFixture, RegressionHarness, RegressionResult
+import json
+from gamess_lsp.features.regression import GoldenFixture, RegressionHarness
+
 
 class TestHarness:
     def test_empty(self):

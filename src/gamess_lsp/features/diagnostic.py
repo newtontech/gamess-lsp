@@ -7,7 +7,6 @@ machine-readable agent feedback loops.
 from __future__ import annotations
 
 import json
-from dataclasses import asdict
 from typing import Any
 
 from lsprotocol.types import (
@@ -18,9 +17,9 @@ from lsprotocol.types import (
 )
 from pygls.server import LanguageServer
 
-from ..keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
+from ..keywords import GAMESS_KEYWORDS
 from ..parser import GAMESSParser
-from ..validator import SemanticDiagnostic, validate_semantics
+from ..validator import validate_semantics
 from .typecheck import TypecheckProvider
 
 _DIAGNOSTIC_SOURCE = "gamess-lsp"
@@ -147,7 +146,6 @@ class DiagnosticProvider:
         # 3. Keyword-level validation against known keywords
         self._validate_keywords(parsed_input, diagnostics)
 
-
         # 4. Typecheck diagnostics (enum, type, required sections)
         typecheck_provider = TypecheckProvider()
         diagnostics.extend(typecheck_provider.validate(parsed_input))
@@ -248,10 +246,14 @@ _SEVERITY_MAP = {
 
 def _diagnostic_to_dict(diag: Diagnostic) -> dict[str, Any]:
     """Convert a ``Diagnostic`` to a JSON-friendly dict."""
-    severity = _SEVERITY_MAP.get(
-        diag.severity,
-        "information",
-    ) if diag.severity else "information"
+    severity = (
+        _SEVERITY_MAP.get(
+            diag.severity,
+            "information",
+        )
+        if diag.severity
+        else "information"
+    )
 
     return {
         "range": {

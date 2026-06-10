@@ -15,7 +15,6 @@ from typing import Any, Dict, List, Tuple
 from gamess_lsp.parser import parse_gamess_input
 from gamess_lsp.validator import validate_semantics
 
-
 FIXTURE_ROOT = Path(__file__).parent
 
 

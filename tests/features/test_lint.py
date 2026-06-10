@@ -10,7 +10,6 @@ import pytest
 
 from gamess_lsp.features.lint import (
     LINT_BOOLEAN_FORMAT,
-    LINT_DUPLICATE_KEYWORD,
     LINT_INVALID_ENUM,
     LINT_LOW_MEMORY,
     LINT_MISSING_BASIS,
@@ -194,10 +193,7 @@ class TestBestPracticeRules:
         assert LINT_MISSING_BASIS in codes
 
     def test_has_basis_no_warning(self, provider: LintProvider) -> None:
-        text = (
-            "$CONTRL SCFTYP=RHF RUNTYP=ENERGY $END\n"
-            "$BASIS GBASIS=STO NGAUSS=3 $END\n"
-        )
+        text = "$CONTRL SCFTYP=RHF RUNTYP=ENERGY $END\n" "$BASIS GBASIS=STO NGAUSS=3 $END\n"
         diagnostics = provider.lint(text)
         codes = [d.code for d in diagnostics]
         assert LINT_MISSING_BASIS not in codes
@@ -209,19 +205,13 @@ class TestBestPracticeRules:
         assert LINT_MISSING_SYSTEM in codes
 
     def test_low_memory_warning(self, provider: LintProvider) -> None:
-        text = (
-            "$CONTRL SCFTYP=RHF RUNTYP=ENERGY $END\n"
-            "$SYSTEM MWORDS=2 $END\n"
-        )
+        text = "$CONTRL SCFTYP=RHF RUNTYP=ENERGY $END\n" "$SYSTEM MWORDS=2 $END\n"
         diagnostics = provider.lint(text)
         codes = [d.code for d in diagnostics]
         assert LINT_LOW_MEMORY in codes
 
     def test_adequate_memory_no_warning(self, provider: LintProvider) -> None:
-        text = (
-            "$CONTRL SCFTYP=RHF RUNTYP=ENERGY $END\n"
-            "$SYSTEM MWORDS=100 $END\n"
-        )
+        text = "$CONTRL SCFTYP=RHF RUNTYP=ENERGY $END\n" "$SYSTEM MWORDS=100 $END\n"
         diagnostics = provider.lint(text)
         codes = [d.code for d in diagnostics]
         assert LINT_LOW_MEMORY not in codes
@@ -270,10 +260,7 @@ class TestValidInput:
         )
         diagnostics = provider.lint(text)
         # Should have no errors or warnings (may have hints/information)
-        errors_and_warnings = [
-            d for d in diagnostics
-            if d.severity in (1, 2)  # Error=1, Warning=2
-        ]
+        errors_and_warnings = [d for d in diagnostics if d.severity in (1, 2)]  # Error=1, Warning=2
         assert len(errors_and_warnings) == 0
 
 
@@ -353,10 +340,7 @@ class TestDeterminism:
     """Ensure diagnostics ordering is deterministic."""
 
     def test_multiple_diagnostics_sorted(self, provider: LintProvider) -> None:
-        text = (
-            "$CONTRL SCFTYP=RHF BOGUS=TRUE $END\n"
-            "$UNKNOWN $END\n"
-        )
+        text = "$CONTRL SCFTYP=RHF BOGUS=TRUE $END\n" "$UNKNOWN $END\n"
         d1 = provider.lint(text)
         d2 = provider.lint(text)
         assert len(d1) == len(d2)
@@ -375,10 +359,7 @@ class TestRuleCodes:
     """All lint diagnostics must carry a string code."""
 
     def test_all_diagnostics_have_code(self, provider: LintProvider) -> None:
-        text = (
-            "$CONTRL SCFTYP=RHF BOGUS=TRUE EXETYP=RUN $END\n"
-            "$SYSTEM MWORDS=2 $END\n"
-        )
+        text = "$CONTRL SCFTYP=RHF BOGUS=TRUE EXETYP=RUN $END\n" "$SYSTEM MWORDS=2 $END\n"
         diagnostics = provider.lint(text)
         for d in diagnostics:
             assert d.code is not None

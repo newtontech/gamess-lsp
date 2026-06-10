@@ -33,7 +33,7 @@ class TestTokenizeLine:
     def test_mixed_quoted_and_unquoted(self):
         """Mix of quoted and unquoted tokens."""
         result = tokenize_line('A=1 NAME="john doe" C=3')
-        assert result == ['A=1', 'NAME="john doe"', 'C=3']
+        assert result == ["A=1", 'NAME="john doe"', "C=3"]
 
     def test_quoted_with_inner_spaces(self):
         """Quoted values with multiple inner spaces."""

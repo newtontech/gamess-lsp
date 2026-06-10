@@ -14,10 +14,10 @@ from lsprotocol.types import (
 from gamess_lsp.features.formatting import GamessFormattingProvider
 from gamess_lsp.server import _format_keywords, formatting, range_formatting
 
-
 # ---------------------------------------------------------------------------
 # Helper to build params
 # ---------------------------------------------------------------------------
+
 
 def _fmt_params(
     uri: str = "file:///test.inp",
@@ -179,7 +179,11 @@ class TestFormattingProvider:
 
     def test_format_data_group_preserves_geometry(self):
         """$DATA group content is preserved with indentation."""
-        text = "$DATA\nWater molecule\nCnv 2\n\nO     8.0   0.0  0.0  0.117\nH     1.0   0.0  0.757 -0.470\n$END"
+        text = (
+            "$DATA\nWater molecule\nCnv 2\n\n"
+            "O     8.0   0.0  0.0  0.117\n"
+            "H     1.0   0.0  0.757 -0.470\n$END"
+        )
         result = self.provider.format_document(text, _fmt_params())
         formatted = result[0].new_text
         assert "  Water molecule" in formatted
@@ -361,17 +365,13 @@ class TestRangeFormatting:
     def test_range_format_empty_range(self):
         """Range formatting with invalid range returns no edits."""
         text = "$CONTRL\nSCFTYP=RHF\n$END"
-        result = self.provider.format_range(
-            text, _range_params(5, 3)  # start > end
-        )
+        result = self.provider.format_range(text, _range_params(5, 3))  # start > end
         assert result == []
 
     def test_range_format_clamps_to_document(self):
         """Range formatting clamps to document boundaries."""
         text = "$CONTRL\nSCFTYP=RHF\n$END"
-        result = self.provider.format_range(
-            text, _range_params(0, 100)  # end beyond document
-        )
+        result = self.provider.format_range(text, _range_params(0, 100))  # end beyond document
         assert isinstance(result, list)
 
     def test_range_format_unchanged_returns_empty(self):

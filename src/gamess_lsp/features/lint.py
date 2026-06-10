@@ -18,7 +18,6 @@ Rule categories
 from __future__ import annotations
 
 import json
-import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -30,7 +29,7 @@ from lsprotocol.types import (
 )
 from pygls.server import LanguageServer
 
-from ..keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
+from ..keywords import GAMESS_KEYWORDS
 from ..parser import GAMESSInputFile, GAMESSParser
 
 _LINT_SOURCE = "gamess-lsp-lint"
@@ -223,20 +222,28 @@ class LintProvider:
     ) -> None:
         """Flag missing $CONTRL and $DATA groups."""
         if "CONTRL" not in parsed.groups:
-            diagnostics.append(self._make_diag(
-                line=0, char=0, end_char=0,
-                message="Missing required $CONTRL group",
-                severity=DiagnosticSeverity.Error,
-                code=LINT_MISSING_CONTRL,
-            ))
+            diagnostics.append(
+                self._make_diag(
+                    line=0,
+                    char=0,
+                    end_char=0,
+                    message="Missing required $CONTRL group",
+                    severity=DiagnosticSeverity.Error,
+                    code=LINT_MISSING_CONTRL,
+                )
+            )
 
         if "DATA" not in parsed.groups:
-            diagnostics.append(self._make_diag(
-                line=0, char=0, end_char=0,
-                message="Missing $DATA group (no molecular geometry provided)",
-                severity=DiagnosticSeverity.Error,
-                code=LINT_MISSING_DATA,
-            ))
+            diagnostics.append(
+                self._make_diag(
+                    line=0,
+                    char=0,
+                    end_char=0,
+                    message="Missing $DATA group (no molecular geometry provided)",
+                    severity=DiagnosticSeverity.Error,
+                    code=LINT_MISSING_DATA,
+                )
+            )
 
     def _check_unclosed_groups(
         self,
@@ -247,12 +254,16 @@ class LintProvider:
         for w in parser.warnings:
             if "not properly closed" in w.get("message", ""):
                 line = w.get("line", 1) - 1
-                diagnostics.append(self._make_diag(
-                    line=line, char=0, end_char=100,
-                    message=w["message"],
-                    severity=DiagnosticSeverity.Warning,
-                    code=LINT_UNCLOSED_GROUP,
-                ))
+                diagnostics.append(
+                    self._make_diag(
+                        line=line,
+                        char=0,
+                        end_char=100,
+                        message=w["message"],
+                        severity=DiagnosticSeverity.Warning,
+                        code=LINT_UNCLOSED_GROUP,
+                    )
+                )
 
     # ------------------------------------------------------------------
     # Schema checks
@@ -273,12 +284,16 @@ class LintProvider:
                 if known and kw_name.upper() not in known:
                     line = kw.line_number - 1
                     col = self._find_keyword_col(lines, line, kw_name)
-                    diagnostics.append(self._make_diag(
-                        line=line, char=col, end_char=col + len(kw_name),
-                        message=f"Unknown keyword '{kw_name}' in ${group_name}",
-                        severity=DiagnosticSeverity.Warning,
-                        code=LINT_UNKNOWN_KEYWORD,
-                    ))
+                    diagnostics.append(
+                        self._make_diag(
+                            line=line,
+                            char=col,
+                            end_char=col + len(kw_name),
+                            message=f"Unknown keyword '{kw_name}' in ${group_name}",
+                            severity=DiagnosticSeverity.Warning,
+                            code=LINT_UNKNOWN_KEYWORD,
+                        )
+                    )
 
     def _check_duplicate_keywords(
         self,
@@ -303,15 +318,19 @@ class LintProvider:
                     prev_line = seen[upper]
                     line = kw.line_number - 1
                     col = self._find_keyword_col(lines, line, kw_name)
-                    diagnostics.append(self._make_diag(
-                        line=line, char=col, end_char=col + len(kw_name),
-                        message=(
-                            f"Duplicate keyword '{kw_name}' in ${group_name} "
-                            f"(first set on line {prev_line})"
-                        ),
-                        severity=DiagnosticSeverity.Warning,
-                        code=LINT_DUPLICATE_KEYWORD,
-                    ))
+                    diagnostics.append(
+                        self._make_diag(
+                            line=line,
+                            char=col,
+                            end_char=col + len(kw_name),
+                            message=(
+                                f"Duplicate keyword '{kw_name}' in ${group_name} "
+                                f"(first set on line {prev_line})"
+                            ),
+                            severity=DiagnosticSeverity.Warning,
+                            code=LINT_DUPLICATE_KEYWORD,
+                        )
+                    )
                 else:
                     seen[upper] = kw.line_number
 
@@ -338,15 +357,19 @@ class LintProvider:
                     continue
                 line = kw.line_number - 1
                 col = self._find_value_col(lines, line, kw.value)
-                diagnostics.append(self._make_diag(
-                    line=line, char=col, end_char=col + len(kw.value),
-                    message=(
-                        f"Invalid value '{kw.value}' for {kw_name} in "
-                        f"${group_name}. Allowed: {', '.join(allowed)}"
-                    ),
-                    severity=DiagnosticSeverity.Error,
-                    code=LINT_INVALID_ENUM,
-                ))
+                diagnostics.append(
+                    self._make_diag(
+                        line=line,
+                        char=col,
+                        end_char=col + len(kw.value),
+                        message=(
+                            f"Invalid value '{kw.value}' for {kw_name} in "
+                            f"${group_name}. Allowed: {', '.join(allowed)}"
+                        ),
+                        severity=DiagnosticSeverity.Error,
+                        code=LINT_INVALID_ENUM,
+                    )
+                )
 
     def _check_numeric_ranges(
         self,
@@ -369,15 +392,19 @@ class LintProvider:
             if val < lo or val > hi:
                 line = kw.line_number - 1
                 col = self._find_value_col(lines, line, kw.value)
-                diagnostics.append(self._make_diag(
-                    line=line, char=col, end_char=col + len(kw.value),
-                    message=(
-                        f"Value {kw.value} for {kw_name} in ${group_name} "
-                        f"is outside recommended range [{lo}, {hi}]"
-                    ),
-                    severity=DiagnosticSeverity.Warning,
-                    code=LINT_NUMERIC_RANGE,
-                ))
+                diagnostics.append(
+                    self._make_diag(
+                        line=line,
+                        char=col,
+                        end_char=col + len(kw.value),
+                        message=(
+                            f"Value {kw.value} for {kw_name} in ${group_name} "
+                            f"is outside recommended range [{lo}, {hi}]"
+                        ),
+                        severity=DiagnosticSeverity.Warning,
+                        code=LINT_NUMERIC_RANGE,
+                    )
+                )
 
     def _check_boolean_format(
         self,
@@ -403,16 +430,20 @@ class LintProvider:
                     line = kw.line_number - 1
                     col = self._find_value_col(lines, line, kw.value)
                     corrected = f".{val_upper}."
-                    diagnostics.append(self._make_diag(
-                        line=line, char=col, end_char=col + len(kw.value),
-                        message=(
-                            f"Boolean value '{kw.value}' should be "
-                            f"'{corrected}' (GAMESS requires dot-prefixed "
-                            f"booleans)"
-                        ),
-                        severity=DiagnosticSeverity.Warning,
-                        code=LINT_BOOLEAN_FORMAT,
-                    ))
+                    diagnostics.append(
+                        self._make_diag(
+                            line=line,
+                            char=col,
+                            end_char=col + len(kw.value),
+                            message=(
+                                f"Boolean value '{kw.value}' should be "
+                                f"'{corrected}' (GAMESS requires dot-prefixed "
+                                f"booleans)"
+                            ),
+                            severity=DiagnosticSeverity.Warning,
+                            code=LINT_BOOLEAN_FORMAT,
+                        )
+                    )
 
     # ------------------------------------------------------------------
     # Best-practice checks
@@ -431,28 +462,40 @@ class LintProvider:
 
         if "RUNTYP" not in contrl.keywords:
             line = contrl.line_start - 1
-            diagnostics.append(self._make_diag(
-                line=line, char=0, end_char=100,
-                message="No RUNTYP specified in $CONTRL (defaults to ENERGY)",
-                severity=DiagnosticSeverity.Information,
-                code=LINT_MISSING_RUNTYP,
-            ))
+            diagnostics.append(
+                self._make_diag(
+                    line=line,
+                    char=0,
+                    end_char=100,
+                    message="No RUNTYP specified in $CONTRL (defaults to ENERGY)",
+                    severity=DiagnosticSeverity.Information,
+                    code=LINT_MISSING_RUNTYP,
+                )
+            )
 
         if "BASIS" not in parsed.groups:
-            diagnostics.append(self._make_diag(
-                line=0, char=0, end_char=0,
-                message="No $BASIS group specified (GAMESS will use a minimal default basis)",
-                severity=DiagnosticSeverity.Information,
-                code=LINT_MISSING_BASIS,
-            ))
+            diagnostics.append(
+                self._make_diag(
+                    line=0,
+                    char=0,
+                    end_char=0,
+                    message="No $BASIS group specified (GAMESS will use a minimal default basis)",
+                    severity=DiagnosticSeverity.Information,
+                    code=LINT_MISSING_BASIS,
+                )
+            )
 
         if "SYSTEM" not in parsed.groups:
-            diagnostics.append(self._make_diag(
-                line=0, char=0, end_char=0,
-                message="No $SYSTEM group specified (default memory may be insufficient)",
-                severity=DiagnosticSeverity.Information,
-                code=LINT_MISSING_SYSTEM,
-            ))
+            diagnostics.append(
+                self._make_diag(
+                    line=0,
+                    char=0,
+                    end_char=0,
+                    message="No $SYSTEM group specified (default memory may be insufficient)",
+                    severity=DiagnosticSeverity.Information,
+                    code=LINT_MISSING_SYSTEM,
+                )
+            )
 
     def _check_low_memory(
         self,
@@ -467,12 +510,16 @@ class LintProvider:
         mwords_kw = system.get_keyword("MWORDS")
         if mwords_kw is None:
             line = system.line_start - 1
-            diagnostics.append(self._make_diag(
-                line=line, char=0, end_char=100,
-                message="MWORDS not specified in $SYSTEM (defaults to 1 MWORD, often too low)",
-                severity=DiagnosticSeverity.Warning,
-                code=LINT_LOW_MEMORY,
-            ))
+            diagnostics.append(
+                self._make_diag(
+                    line=line,
+                    char=0,
+                    end_char=100,
+                    message="MWORDS not specified in $SYSTEM (defaults to 1 MWORD, often too low)",
+                    severity=DiagnosticSeverity.Warning,
+                    code=LINT_LOW_MEMORY,
+                )
+            )
             return
         try:
             val = int(float(mwords_kw.value))
@@ -481,15 +528,19 @@ class LintProvider:
         if val < 10:
             line = mwords_kw.line_number - 1
             col = self._find_value_col(lines, line, mwords_kw.value)
-            diagnostics.append(self._make_diag(
-                line=line, char=col, end_char=col + len(mwords_kw.value),
-                message=(
-                    f"MWORDS={val} may be insufficient for most calculations "
-                    f"(consider >= 100)"
-                ),
-                severity=DiagnosticSeverity.Information,
-                code=LINT_LOW_MEMORY,
-            ))
+            diagnostics.append(
+                self._make_diag(
+                    line=line,
+                    char=col,
+                    end_char=col + len(mwords_kw.value),
+                    message=(
+                        f"MWORDS={val} may be insufficient for most calculations "
+                        f"(consider >= 100)"
+                    ),
+                    severity=DiagnosticSeverity.Information,
+                    code=LINT_LOW_MEMORY,
+                )
+            )
 
     def _check_redundant_defaults(
         self,
@@ -508,15 +559,19 @@ class LintProvider:
             if kw.value.upper() == default_val.upper():
                 line = kw.line_number - 1
                 col = self._find_keyword_col(lines, line, kw_name)
-                diagnostics.append(self._make_diag(
-                    line=line, char=col, end_char=col + len(kw_name),
-                    message=(
-                        f"{kw_name}={kw.value} is the GAMESS default -- "
-                        f"this line can be removed"
-                    ),
-                    severity=DiagnosticSeverity.Hint,
-                    code=LINT_REDUNDANT_DEFAULT,
-                ))
+                diagnostics.append(
+                    self._make_diag(
+                        line=line,
+                        char=col,
+                        end_char=col + len(kw_name),
+                        message=(
+                            f"{kw_name}={kw.value} is the GAMESS default -- "
+                            f"this line can be removed"
+                        ),
+                        severity=DiagnosticSeverity.Hint,
+                        code=LINT_REDUNDANT_DEFAULT,
+                    )
+                )
 
     # ------------------------------------------------------------------
     # Helpers
@@ -591,11 +646,7 @@ _SEVERITY_MAP: dict[int, str] = {
 
 def _diag_to_dict(diag: Diagnostic) -> dict[str, Any]:
     """Convert a ``Diagnostic`` to a JSON-friendly dict."""
-    severity = (
-        _SEVERITY_MAP.get(diag.severity, "information")
-        if diag.severity
-        else "information"
-    )
+    severity = _SEVERITY_MAP.get(diag.severity, "information") if diag.severity else "information"
     return {
         "range": {
             "start": {

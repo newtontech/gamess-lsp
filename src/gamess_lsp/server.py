@@ -49,7 +49,6 @@ from .features.typecheck import TypecheckProvider
 from .features.lint import LintProvider
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from .parser import GAMESSParser
-from .tokenizer import tokenize_line
 from .validator import validate_semantics
 
 # Security: Use WARNING as default log level to prevent information disclosure
@@ -377,7 +376,6 @@ def _get_diagnostics(content: str) -> List[Diagnostic]:
                 code=diag.code,
             )
         )
-
 
     # 3. Typecheck diagnostics (enum, type, required sections)
     typecheck_provider = TypecheckProvider()
