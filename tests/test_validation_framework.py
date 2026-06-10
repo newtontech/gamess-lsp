@@ -38,9 +38,8 @@ class TestFixtureCorpus:
     def test_fixture(self, fixture_case):
         """Each fixture should produce exactly the expected diagnostics."""
         passed, mismatches = run_fixture(fixture_case)
-        assert passed, (
-            f"Fixture {fixture_case.name} failed:\n"
-            + "\n".join(f"  - {m}" for m in mismatches)
+        assert passed, f"Fixture {fixture_case.name} failed:\n" + "\n".join(
+            f"  - {m}" for m in mismatches
         )
 
 
@@ -80,24 +79,18 @@ class TestCategoryAccuracy:
         report = compute_accuracy_report()
         cat = report.categories.get("mutually_exclusive")
         if cat and cat.total > 0:
-            assert cat.precision >= 0.90, (
-                f"mutually_exclusive precision {cat.precision:.2%} < 90%"
-            )
-            assert cat.recall >= 0.90, (
-                f"mutually_exclusive recall {cat.recall:.2%} < 90%"
-            )
+            assert cat.precision >= 0.90, f"mutually_exclusive precision {cat.precision:.2%} < 90%"
+            assert cat.recall >= 0.90, f"mutually_exclusive recall {cat.recall:.2%} < 90%"
 
     def test_chemical_constraints_accuracy(self):
         """Chemical constraint detection should be accurate."""
         report = compute_accuracy_report()
         cat = report.categories.get("chemical_constraints")
         if cat and cat.total > 0:
-            assert cat.precision >= 0.90, (
-                f"chemical_constraints precision {cat.precision:.2%} < 90%"
-            )
-            assert cat.recall >= 0.90, (
-                f"chemical_constraints recall {cat.recall:.2%} < 90%"
-            )
+            assert (
+                cat.precision >= 0.90
+            ), f"chemical_constraints precision {cat.precision:.2%} < 90%"
+            assert cat.recall >= 0.90, f"chemical_constraints recall {cat.recall:.2%} < 90%"
 
     def test_valid_inputs_no_errors(self):
         """Valid inputs should produce zero error-level diagnostics."""
@@ -107,7 +100,8 @@ class TestCategoryAccuracy:
             parsed = parse_gamess_input(case.input_text)
             diagnostics = validate_semantics(parsed)
             errors = [d for d in diagnostics if d.severity == "error"]
-            assert len(errors) == 0, (
-                f"Valid input fixture {case.name} produced unexpected errors: "
-                + ", ".join(d.code for d in errors)
+            assert (
+                len(errors) == 0
+            ), f"Valid input fixture {case.name} produced unexpected errors: " + ", ".join(
+                d.code for d in errors
             )

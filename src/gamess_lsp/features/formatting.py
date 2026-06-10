@@ -42,9 +42,7 @@ class GamessFormattingProvider:
         """
         self.server = server
 
-    def format_document(
-        self, text: str, params: DocumentFormattingParams
-    ) -> List[TextEdit]:
+    def format_document(self, text: str, params: DocumentFormattingParams) -> List[TextEdit]:
         """Format the entire document.
 
         Args:
@@ -71,9 +69,7 @@ class GamessFormattingProvider:
             )
         ]
 
-    def format_range(
-        self, text: str, params: DocumentRangeFormattingParams
-    ) -> List[TextEdit]:
+    def format_range(self, text: str, params: DocumentRangeFormattingParams) -> List[TextEdit]:
         """Format a specific range of the document.
 
         For range formatting, the provider formats only the selected line range.
@@ -104,9 +100,7 @@ class GamessFormattingProvider:
 
         # Compute indent context from the beginning of the document
         # so we know the correct nesting level at the range start.
-        indent_level, in_data = self._compute_context_at_line(
-            all_lines, start_line
-        )
+        indent_level, in_data = self._compute_context_at_line(all_lines, start_line)
 
         edits: List[TextEdit] = []
 
@@ -130,9 +124,7 @@ class GamessFormattingProvider:
                 )
 
             # Update context for next line based on this line
-            indent_level, in_data = self._update_context(
-                formatted.strip(), indent_level, in_data
-            )
+            indent_level, in_data = self._update_context(formatted.strip(), indent_level, in_data)
 
         return edits
 
@@ -171,9 +163,7 @@ class GamessFormattingProvider:
                 indent_level = max(0, indent_level - 1)
                 in_data = False
                 data_line_count = 0
-                formatted_lines.append(
-                    indent_str * indent_level + "$END"
-                )
+                formatted_lines.append(indent_str * indent_level + "$END")
                 continue
 
             # Group start: $GROUPNAME
@@ -194,9 +184,7 @@ class GamessFormattingProvider:
                     if rest.upper().startswith("$END"):
                         indent_level = max(0, indent_level - 1)
                         in_data = False
-                        formatted_lines.append(
-                            indent_str * indent_level + "$END"
-                        )
+                        formatted_lines.append(indent_str * indent_level + "$END")
                     elif in_data:
                         # Inside $DATA: title/symmetry line
                         data_line_count += 1
@@ -204,9 +192,7 @@ class GamessFormattingProvider:
                     else:
                         # Inline keywords after group name
                         formatted_keywords = self._format_keywords(rest)
-                        formatted_lines.append(
-                            indent_str * indent_level + formatted_keywords
-                        )
+                        formatted_lines.append(indent_str * indent_level + formatted_keywords)
 
                 continue
 
@@ -219,9 +205,7 @@ class GamessFormattingProvider:
             # Regular keyword line inside a group
             if indent_level > 0 and "=" in stripped:
                 formatted_keywords = self._format_keywords(stripped)
-                formatted_lines.append(
-                    indent_str * indent_level + formatted_keywords
-                )
+                formatted_lines.append(indent_str * indent_level + formatted_keywords)
                 continue
 
             # Fallback: preserve stripped content at current indent
@@ -288,9 +272,7 @@ class GamessFormattingProvider:
         return indent_str * indent_level + stripped
 
     @staticmethod
-    def _compute_context_at_line(
-        lines: List[str], target_line: int
-    ) -> tuple[int, bool]:
+    def _compute_context_at_line(lines: List[str], target_line: int) -> tuple[int, bool]:
         """Compute the indentation level and $DATA context at a target line.
 
         Args:
@@ -315,9 +297,7 @@ class GamessFormattingProvider:
                 indent_level = max(0, indent_level - 1)
                 in_data = False
             else:
-                group_match = re.match(
-                    r"^\$([A-Za-z_][A-Za-z0-9_]*)", stripped
-                )
+                group_match = re.match(r"^\$([A-Za-z_][A-Za-z0-9_]*)", stripped)
                 if group_match:
                     group_name = group_match.group(1).upper()
                     if group_name != "END":

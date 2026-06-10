@@ -217,13 +217,17 @@ class TestBooleanType:
         assert any("Expected boolean" in m and "NOSYM" in m for m in msgs)
 
     def test_valid_boolean_true(self) -> None:
-        text = "$CONTRL SCFTYP=RHF RUNTYP=ENERGY NOSYM=.TRUE. $END\n$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
+        text = (
+            "$CONTRL SCFTYP=RHF RUNTYP=ENERGY NOSYM=.TRUE. $END\n$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
+        )
         diagnostics = _parse_and_validate(text)
         bool_errors = [m for m in _messages(diagnostics) if "NOSYM" in m and "boolean" in m.lower()]
         assert len(bool_errors) == 0
 
     def test_valid_boolean_false(self) -> None:
-        text = "$CONTRL SCFTYP=RHF RUNTYP=ENERGY NOSYM=.FALSE. $END\n$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
+        text = (
+            "$CONTRL SCFTYP=RHF RUNTYP=ENERGY NOSYM=.FALSE. $END\n$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
+        )
         diagnostics = _parse_and_validate(text)
         bool_errors = [m for m in _messages(diagnostics) if "NOSYM" in m and "boolean" in m.lower()]
         assert len(bool_errors) == 0
@@ -384,7 +388,9 @@ class TestFloatType:
             "$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
         )
         diagnostics = _parse_and_validate(text)
-        float_errors = [m for m in _messages(diagnostics) if "OPTTOL" in m and "numeric" in m.lower()]
+        float_errors = [
+            m for m in _messages(diagnostics) if "OPTTOL" in m and "numeric" in m.lower()
+        ]
         assert len(float_errors) == 0
 
     def test_scientific_notation_opttol(self) -> None:
@@ -394,7 +400,9 @@ class TestFloatType:
             "$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
         )
         diagnostics = _parse_and_validate(text)
-        float_errors = [m for m in _messages(diagnostics) if "OPTTOL" in m and "numeric" in m.lower()]
+        float_errors = [
+            m for m in _messages(diagnostics) if "OPTTOL" in m and "numeric" in m.lower()
+        ]
         assert len(float_errors) == 0
 
     def test_scientific_notation_lowercase(self) -> None:
@@ -405,7 +413,9 @@ class TestFloatType:
             "$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
         )
         diagnostics = _parse_and_validate(text)
-        float_errors = [m for m in _messages(diagnostics) if "OPTTOL" in m and "numeric" in m.lower()]
+        float_errors = [
+            m for m in _messages(diagnostics) if "OPTTOL" in m and "numeric" in m.lower()
+        ]
         assert len(float_errors) == 0
 
     def test_d_notation(self) -> None:
@@ -416,7 +426,9 @@ class TestFloatType:
             "$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
         )
         diagnostics = _parse_and_validate(text)
-        float_errors = [m for m in _messages(diagnostics) if "OPTTOL" in m and "numeric" in m.lower()]
+        float_errors = [
+            m for m in _messages(diagnostics) if "OPTTOL" in m and "numeric" in m.lower()
+        ]
         assert len(float_errors) == 0
 
     def test_numeric_diagnostic_code(self) -> None:
@@ -445,7 +457,9 @@ class TestFloatType:
             "$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
         )
         diagnostics = _parse_and_validate(text)
-        float_errors = [m for m in _messages(diagnostics) if "CCCONV" in m and "numeric" in m.lower()]
+        float_errors = [
+            m for m in _messages(diagnostics) if "CCCONV" in m and "numeric" in m.lower()
+        ]
         assert len(float_errors) == 0
 
 
@@ -586,10 +600,7 @@ class TestMultipleErrors:
         assert any("integer" in m.lower() and "MAXIT" in m for m in msgs)
 
     def test_enum_and_type_errors(self) -> None:
-        text = (
-            "$CONTRL SCFTYP=BAD RUNTYP=WORSE NOSYM=YES $END\n"
-            "$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
-        )
+        text = "$CONTRL SCFTYP=BAD RUNTYP=WORSE NOSYM=YES $END\n" "$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
         diagnostics = _parse_and_validate(text)
         codes = _codes(diagnostics)
         assert "INVALID_ENUM" in codes
@@ -605,7 +616,10 @@ class TestDiagnosticSource:
     """All typecheck diagnostics should carry the correct source."""
 
     def test_all_diagnostics_use_typecheck_source(self) -> None:
-        text = "$CONTRL SCFTYP=RHF RUNTYP=ENERGY NOSYM=YES MAXIT=bad $END\n$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
+        text = (
+            "$CONTRL SCFTYP=RHF RUNTYP=ENERGY NOSYM=YES MAXIT=bad $END\n"
+            "$DATA\nT\nC1\n\nO 8 0 0 0\n $END"
+        )
         diagnostics = _parse_and_validate(text)
         assert len(diagnostics) > 0
         for d in diagnostics:

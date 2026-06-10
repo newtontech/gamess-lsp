@@ -482,8 +482,11 @@ H     1.0   0.0   0.74  0.0
         diagnostics = validate_semantics(parsed)
 
         # No post-HF conflict errors
-        conflict_codes = [c for c in ["INCOMPAT_MP2_CI", "INCOMPAT_CC_CI", "INCOMPAT_DFT_CI"]
-                          if c in [d.code for d in diagnostics]]
+        conflict_codes = [
+            c
+            for c in ["INCOMPAT_MP2_CI", "INCOMPAT_CC_CI", "INCOMPAT_DFT_CI"]
+            if c in [d.code for d in diagnostics]
+        ]
         assert len(conflict_codes) == 0
 
 

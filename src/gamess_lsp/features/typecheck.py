@@ -355,8 +355,7 @@ class TypecheckProvider:
                         ),
                         message=(
                             f"Expected positive integer for {kw_upper} in "
-                            f"${group_name}, got '{value}'."
-                            + self._unit_hint(key)
+                            f"${group_name}, got '{value}'." + self._unit_hint(key)
                         ),
                         severity=DiagnosticSeverity.Error,
                         source=_DIAGNOSTIC_SOURCE,
@@ -374,8 +373,7 @@ class TypecheckProvider:
                         ),
                         message=(
                             f"Expected positive integer for {kw_upper} in "
-                            f"${group_name}, got {int_val}."
-                            + self._unit_hint(key)
+                            f"${group_name}, got {int_val}." + self._unit_hint(key)
                         ),
                         severity=DiagnosticSeverity.Error,
                         source=_DIAGNOSTIC_SOURCE,
@@ -395,8 +393,7 @@ class TypecheckProvider:
                         ),
                         message=(
                             f"Expected integer for {kw_upper} in ${group_name}, "
-                            f"got '{value}'."
-                            + self._unit_hint(key)
+                            f"got '{value}'." + self._unit_hint(key)
                         ),
                         severity=DiagnosticSeverity.Error,
                         source=_DIAGNOSTIC_SOURCE,
@@ -416,8 +413,7 @@ class TypecheckProvider:
                         ),
                         message=(
                             f"Expected numeric value for {kw_upper} in "
-                            f"${group_name}, got '{value}'."
-                            + self._unit_hint(key)
+                            f"${group_name}, got '{value}'." + self._unit_hint(key)
                         ),
                         severity=DiagnosticSeverity.Error,
                         source=_DIAGNOSTIC_SOURCE,

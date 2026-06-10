@@ -261,10 +261,7 @@ class TestDeterminism:
 
     def test_multiple_diagnostics_sorted(self, provider: DiagnosticProvider) -> None:
         """Diagnostics from multiple sources must be consistently ordered."""
-        text = (
-            "$CONTRL SCFTYP=RHF DFTTYP=B3LYP MPLEVL=2 RUNTYP=IRC $END\n"
-            "$UNKNOWN $END\n"
-        )
+        text = "$CONTRL SCFTYP=RHF DFTTYP=B3LYP MPLEVL=2 RUNTYP=IRC $END\n" "$UNKNOWN $END\n"
         d1 = provider.get_diagnostics(text)
         d2 = provider.get_diagnostics(text)
         # Must produce the same list each time
