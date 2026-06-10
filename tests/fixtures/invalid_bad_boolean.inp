@@ -1,0 +1,11 @@
+! Boolean values without dots
+ $CONTRL SCFTYP=RHF RUNTYP=ENERGY NOSYM=TRUE $END
+ $SYSTEM MWORDS=100 $END
+ $BASIS GBASIS=CC-PVDZ DIFFSP=FALSE $END
+ $DATA
+Water
+C1
+
+O     8.0   0.0   0.0   0.0
+H     1.0   0.96   0.0   0.0
+ $END
