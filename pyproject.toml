@@ -30,6 +30,7 @@ dev = [
 
 [project.scripts]
 gamess-lsp = "gamess_lsp.server:main"
+gamess-lsp-tool = "gamess_lsp.tool:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gamess_lsp"]
@@ -70,3 +71,4 @@ exclude_lines = [
     "pass",
     "..."
 ]
+
