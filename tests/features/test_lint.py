@@ -364,7 +364,7 @@ class TestRuleCodes:
         for d in diagnostics:
             assert d.code is not None
             assert isinstance(d.code, str)
-            assert d.code.startswith("LINT_")
+            assert d.code.startswith(("LINT_", "GAMESS-"))
 
     def test_all_diagnostics_have_lint_source(self, provider: LintProvider) -> None:
         text = "$CONTRL SCFTYP=RHF $END"

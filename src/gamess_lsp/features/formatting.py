@@ -20,7 +20,7 @@ from lsprotocol.types import (
 )
 from pygls.server import LanguageServer
 
-from ..tokenizer import tokenize_line
+from ..tokenizer import parse_keyword_pairs, tokenize_line
 
 
 class GamessFormattingProvider:

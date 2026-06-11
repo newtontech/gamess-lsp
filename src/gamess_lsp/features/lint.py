@@ -73,6 +73,16 @@ LINT_MISSING_SYSTEM = "LINT_MISSING_SYSTEM"
 LINT_LOW_MEMORY = "LINT_LOW_MEMORY"
 LINT_REDUNDANT_DEFAULT = "LINT_REDUNDANT_DEFAULT"
 
+# GAMESS-prefixed OpenQC rules (issues #68-#75)
+GAMESS_SYNTAX_MISSING_END = "GAMESS-E050"
+GAMESS_CONTROL_MISSING_CONTRL = "GAMESS-E051"
+GAMESS_CONTROL_INVALID_SCFTYP = "GAMESS-E052"
+GAMESS_CONTROL_INVALID_RUNTYP = "GAMESS-E053"
+GAMESS_DATA_MISSING_DATA = "GAMESS-E054"
+GAMESS_DATA_CHARGE_MULT_MISMATCH = "GAMESS-W050"
+GAMESS_LOG_SCF_NOT_CONVERGED = "GAMESS-E055"
+GAMESS_LOG_RUNTIME_ERROR = "GAMESS-E056"
+
 
 # ------------------------------------------------------------------
 # Numeric constraints per keyword (group, keyword) -> (min, max)
@@ -108,6 +118,38 @@ _REDUNDANT_DEFAULTS: dict[tuple[str, str], str] = {
     ("FORCE", "PROJCT"): ".TRUE.",
     ("FORCE", "VIBANL"): ".TRUE.",
     ("STATPT", "HESS"): "GUESS",
+}
+
+
+# ------------------------------------------------------------------
+# GAMESS log-file error patterns (issues #74, #75)
+# ------------------------------------------------------------------
+
+_SCF_NOT_CONVERGED_PATTERNS = [
+    "SCF FAILED TO CONVERGE",
+    "CONVERGENCE NOT ACHIEVED",
+    "SCF DID NOT CONVERGE",
+    "MAXIMUM NUMBER OF SCF ITERATIONS EXCEEDED",
+    "SCF FAILURE",
+]
+
+_RUNTIME_ERROR_PATTERNS = [
+    "ERROR IN INTEGRAL",
+    "FATAL ERROR",
+    "EXECUTION OF GAMESS TERMINATED",
+    "UNABLE TO DETERMINE",
+    "BAD INPUT",
+    "ILLEGAL",
+    "CHECK YOUR INPUT",
+]
+
+# Valid SCFTYP values (from keywords database)
+_VALID_SCFTYP_VALUES = {"RHF", "UHF", "ROHF", "MCSCF", "NONE"}
+
+# Valid RUNTYP values (from keywords database)
+_VALID_RUNTYP_VALUES = {
+    "ENERGY", "GRADIENT", "HESSIAN", "OPTIMIZE", "SADPOINT",
+    "IRC", "DRC", "SURFACE", "GLOBOP",
 }
 
 
@@ -208,6 +250,16 @@ class LintProvider:
         self._check_low_memory(parsed, lines, diagnostics)
         self._check_redundant_defaults(parsed, lines, diagnostics)
 
+        # --- GAMESS-prefixed OpenQC rules (#68-#75) ---
+        self._check_syntax_missing_end(parser, parsed, lines, diagnostics)
+        self._check_control_missing_contrl(parsed, lines, diagnostics)
+        self._check_control_invalid_scftyp(parsed, lines, diagnostics)
+        self._check_control_invalid_runtyp(parsed, lines, diagnostics)
+        self._check_data_missing_data(parsed, lines, diagnostics)
+        self._check_data_charge_mult_mismatch(parsed, lines, diagnostics)
+        self._check_log_scf_not_converged(parsed, lines, text, diagnostics)
+        self._check_log_runtime_error(parsed, lines, text, diagnostics)
+
         return diagnostics
 
     # ------------------------------------------------------------------
@@ -244,6 +296,244 @@ class LintProvider:
                     code=LINT_MISSING_DATA,
                 )
             )
+
+    # ------------------------------------------------------------------
+    # GAMESS-prefixed OpenQC rule checks (#68-#75)
+    # ------------------------------------------------------------------
+
+    def _check_syntax_missing_end(
+        self,
+        parser: GAMESSParser,
+        parsed: GAMESSInputFile,
+        lines: list[str],
+        diagnostics: list[Diagnostic],
+    ) -> None:
+        """GAMESS-E050: Flag groups not closed with $END."""
+        for w in parser.warnings:
+            if "not properly closed" in w.get("message", ""):
+                line = w.get("line", 1) - 1
+                group_name = "UNKNOWN"
+                for gname, g in parsed.groups.items():
+                    if g.line_start - 1 == line:
+                        group_name = gname
+                        break
+                diagnostics.append(
+                    self._make_diag(
+                        line=line,
+                        char=0,
+                        end_char=100,
+                        message=f"Group ${group_name} missing $END terminator",
+                        severity=DiagnosticSeverity.Error,
+                        code=GAMESS_SYNTAX_MISSING_END,
+                    )
+                )
+
+    def _check_control_missing_contrl(
+        self,
+        parsed: GAMESSInputFile,
+        lines: list[str],
+        diagnostics: list[Diagnostic],
+    ) -> None:
+        """GAMESS-E051: Flag missing $CONTRL group."""
+        if "CONTRL" not in parsed.groups:
+            diagnostics.append(
+                self._make_diag(
+                    line=0,
+                    char=0,
+                    end_char=0,
+                    message="Required $CONTRL group is missing",
+                    severity=DiagnosticSeverity.Error,
+                    code=GAMESS_CONTROL_MISSING_CONTRL,
+                )
+            )
+
+    def _check_control_invalid_scftyp(
+        self,
+        parsed: GAMESSInputFile,
+        lines: list[str],
+        diagnostics: list[Diagnostic],
+    ) -> None:
+        """GAMESS-E052: Flag invalid SCFTYP value in $CONTRL."""
+        contrl = parsed.get_group("CONTRL")
+        if contrl is None:
+            return
+        scftyp_kw = contrl.get_keyword("SCFTYP")
+        if scftyp_kw is None:
+            return
+        val = scftyp_kw.value.upper().strip()
+        if val not in _VALID_SCFTYP_VALUES:
+            line = scftyp_kw.line_number - 1
+            col = self._find_value_col(lines, line, scftyp_kw.value)
+            diagnostics.append(
+                self._make_diag(
+                    line=line,
+                    char=col,
+                    end_char=col + len(scftyp_kw.value),
+                    message=(
+                        f"Invalid SCFTYP='{scftyp_kw.value}'. "
+                        f"Allowed: {', '.join(sorted(_VALID_SCFTYP_VALUES))}"
+                    ),
+                    severity=DiagnosticSeverity.Error,
+                    code=GAMESS_CONTROL_INVALID_SCFTYP,
+                )
+            )
+
+    def _check_control_invalid_runtyp(
+        self,
+        parsed: GAMESSInputFile,
+        lines: list[str],
+        diagnostics: list[Diagnostic],
+    ) -> None:
+        """GAMESS-E053: Flag invalid RUNTYP value in $CONTRL."""
+        contrl = parsed.get_group("CONTRL")
+        if contrl is None:
+            return
+        runtyp_kw = contrl.get_keyword("RUNTYP")
+        if runtyp_kw is None:
+            return
+        val = runtyp_kw.value.upper().strip()
+        if val not in _VALID_RUNTYP_VALUES:
+            line = runtyp_kw.line_number - 1
+            col = self._find_value_col(lines, line, runtyp_kw.value)
+            diagnostics.append(
+                self._make_diag(
+                    line=line,
+                    char=col,
+                    end_char=col + len(runtyp_kw.value),
+                    message=(
+                        f"Invalid RUNTYP='{runtyp_kw.value}'. "
+                        f"Allowed: {', '.join(sorted(_VALID_RUNTYP_VALUES))}"
+                    ),
+                    severity=DiagnosticSeverity.Error,
+                    code=GAMESS_CONTROL_INVALID_RUNTYP,
+                )
+            )
+
+    def _check_data_missing_data(
+        self,
+        parsed: GAMESSInputFile,
+        lines: list[str],
+        diagnostics: list[Diagnostic],
+    ) -> None:
+        """GAMESS-E054: Flag missing $DATA group."""
+        if "DATA" not in parsed.groups:
+            diagnostics.append(
+                self._make_diag(
+                    line=0,
+                    char=0,
+                    end_char=0,
+                    message="Required $DATA group is missing (no molecular geometry)",
+                    severity=DiagnosticSeverity.Error,
+                    code=GAMESS_DATA_MISSING_DATA,
+                )
+            )
+
+    def _check_data_charge_mult_mismatch(
+        self,
+        parsed: GAMESSInputFile,
+        lines: list[str],
+        diagnostics: list[Diagnostic],
+    ) -> None:
+        """GAMESS-W050: Flag charge/multiplicity vs electron count mismatch."""
+        contrl = parsed.get_group("CONTRL")
+        if contrl is None:
+            return
+        geometry = parsed.geometry
+        if not geometry:
+            return
+
+        # Calculate total electrons from geometry
+        total_electrons = 0
+        for atom in geometry:
+            z = atom.get("z", 0)
+            try:
+                total_electrons += int(float(z))
+            except (ValueError, TypeError):
+                continue
+
+        # Adjust for charge
+        icharg_kw = contrl.get_keyword("ICHARG")
+        if icharg_kw is not None:
+            try:
+                total_electrons -= int(float(icharg_kw.value))
+            except (ValueError, TypeError):
+                pass
+
+        # Get multiplicity
+        mult_kw = contrl.get_keyword("MULT")
+        if mult_kw is None:
+            return
+        try:
+            mult = int(float(mult_kw.value))
+        except (ValueError, TypeError):
+            return
+
+        # Validate: electrons % 2 should differ from mult % 2
+        if total_electrons % 2 == mult % 2:
+            line = mult_kw.line_number - 1
+            col = self._find_value_col(lines, line, mult_kw.value)
+            diagnostics.append(
+                self._make_diag(
+                    line=line,
+                    char=col,
+                    end_char=col + len(mult_kw.value),
+                    message=(
+                        f"Charge/multiplicity mismatch: {total_electrons} electrons "
+                        f"are incompatible with MULT={mult}"
+                    ),
+                    severity=DiagnosticSeverity.Warning,
+                    code=GAMESS_DATA_CHARGE_MULT_MISMATCH,
+                )
+            )
+
+    def _check_log_scf_not_converged(
+        self,
+        parsed: GAMESSInputFile,
+        lines: list[str],
+        text: str,
+        diagnostics: list[Diagnostic],
+    ) -> None:
+        """GAMESS-E055: Detect SCF convergence failure in log-style output."""
+        text_upper = text.upper()
+        for i, line in enumerate(lines):
+            line_upper = line.upper()
+            for pattern in _SCF_NOT_CONVERGED_PATTERNS:
+                if pattern in line_upper:
+                    diagnostics.append(
+                        self._make_diag(
+                            line=i,
+                            char=0,
+                            end_char=len(line),
+                            message=f"SCF convergence failure: {line.strip()}",
+                            severity=DiagnosticSeverity.Error,
+                            code=GAMESS_LOG_SCF_NOT_CONVERGED,
+                        )
+                    )
+                    break  # Only one diag per line
+
+    def _check_log_runtime_error(
+        self,
+        parsed: GAMESSInputFile,
+        lines: list[str],
+        text: str,
+        diagnostics: list[Diagnostic],
+    ) -> None:
+        """GAMESS-E056: Detect runtime errors in log-style output."""
+        for i, line in enumerate(lines):
+            line_upper = line.upper()
+            for pattern in _RUNTIME_ERROR_PATTERNS:
+                if pattern in line_upper:
+                    diagnostics.append(
+                        self._make_diag(
+                            line=i,
+                            char=0,
+                            end_char=len(line),
+                            message=f"Runtime error detected: {line.strip()}",
+                            severity=DiagnosticSeverity.Error,
+                            code=GAMESS_LOG_RUNTIME_ERROR,
+                        )
+                    )
+                    break  # Only one diag per line
 
     def _check_unclosed_groups(
         self,
@@ -665,4 +955,14 @@ def _diag_to_dict(diag: Diagnostic) -> dict[str, Any]:
     }
 
 
-__all__ = ["LintProvider"]
+__all__ = [
+    "LintProvider",
+    "GAMESS_SYNTAX_MISSING_END",
+    "GAMESS_CONTROL_MISSING_CONTRL",
+    "GAMESS_CONTROL_INVALID_SCFTYP",
+    "GAMESS_CONTROL_INVALID_RUNTYP",
+    "GAMESS_DATA_MISSING_DATA",
+    "GAMESS_DATA_CHARGE_MULT_MISMATCH",
+    "GAMESS_LOG_SCF_NOT_CONVERGED",
+    "GAMESS_LOG_RUNTIME_ERROR",
+]
