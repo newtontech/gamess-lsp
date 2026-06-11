@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 from .constants import ELEMENT_ATOMIC_NUMBERS
-from .tokenizer import tokenize_line
+from .tokenizer import parse_keyword_pairs, tokenize_line
 
 
 @dataclass
