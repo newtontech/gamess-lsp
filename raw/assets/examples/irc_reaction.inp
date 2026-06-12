@@ -1,0 +1,11 @@
+! IRC calculation for transition state
+ $CONTRL SCFTYP=RHF RUNTYP=IRC $END
+ $SYSTEM MWORDS=150 $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $IRC METHOD=RFO NPOINT=50 STRIDE=0.1 $END
+ $DATA
+IRC reaction path
+C1
+
+... geometry data ...
+ $END
