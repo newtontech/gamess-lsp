@@ -1,0 +1,12 @@
+! Water vibrational frequencies
+ $CONTRL SCFTYP=RHF RUNTYP=HESSIAN $END
+ $SYSTEM MWORDS=100 $END
+ $BASIS GBASIS=CC-PVDZ $END
+ $FORCE VIBANL=.TRUE. $END
+ $DATA
+Water frequencies
+Cnv 2
+
+O     8.0   0.000000   0.000000   0.117489
+H     1.0   0.000000   0.757210  -0.469957
+ $END
