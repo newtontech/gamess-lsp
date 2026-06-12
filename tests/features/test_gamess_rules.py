@@ -251,7 +251,10 @@ class TestChargeMultMismatch:
 
     def test_singlet_even_electrons_ok(self, provider: LintProvider) -> None:
         """H2: 2 electrons, MULT=1 (singlet) is valid."""
-        text = self._make_input(mult="1", atoms="H     1.0   0.0   0.0   0.0\nH     1.0   0.0   0.0   0.9")
+        text = self._make_input(
+            mult="1",
+            atoms="H     1.0   0.0   0.0   0.0\nH     1.0   0.0   0.0   0.9",
+        )
         codes = [d.code for d in provider.lint(text)]
         assert GAMESS_DATA_CHARGE_MULT_MISMATCH not in codes
 
@@ -263,7 +266,10 @@ class TestChargeMultMismatch:
 
     def test_triplet_even_electrons_ok(self, provider: LintProvider) -> None:
         """2 electrons, MULT=3 (triplet) is valid (2 unpaired)."""
-        text = self._make_input(mult="3", atoms="H     1.0   0.0   0.0   0.0\nH     1.0   0.0   0.0   0.9")
+        text = self._make_input(
+            mult="3",
+            atoms="H     1.0   0.0   0.0   0.0\nH     1.0   0.0   0.0   0.9",
+        )
         codes = [d.code for d in provider.lint(text)]
         assert GAMESS_DATA_CHARGE_MULT_MISMATCH not in codes
 
