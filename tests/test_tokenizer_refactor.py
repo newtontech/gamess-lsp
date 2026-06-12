@@ -4,8 +4,6 @@ Verifies that the consolidated keyword parsing function correctly handles
 all GAMESS input formats, including edge cases.
 """
 
-import pytest
-
 from gamess_lsp.tokenizer import parse_keyword_pairs, tokenize_line
 
 

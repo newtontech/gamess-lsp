@@ -7,7 +7,7 @@ pair extraction, eliminating duplication between parser and formatter
 
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 
 def tokenize_line(line: str) -> List[str]:

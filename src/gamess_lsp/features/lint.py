@@ -494,7 +494,6 @@ class LintProvider:
         diagnostics: list[Diagnostic],
     ) -> None:
         """GAMESS-E055: Detect SCF convergence failure in log-style output."""
-        text_upper = text.upper()
         for i, line in enumerate(lines):
             line_upper = line.upper()
             for pattern in _SCF_NOT_CONVERGED_PATTERNS:
