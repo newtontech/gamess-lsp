@@ -1,0 +1,40 @@
+{
+  "fixtures": [
+    {
+      "name": "valid_scf",
+      "path": "tests/fixtures/preflight/valid_scf/input.inp",
+      "expect_ok": true,
+      "expect_codes": []
+    },
+    {
+      "name": "missing_data",
+      "path": "tests/fixtures/preflight/missing_data/input.inp",
+      "expect_ok": false,
+      "expect_codes": ["GAMESS601"]
+    },
+    {
+      "name": "missing_basis",
+      "path": "tests/fixtures/preflight/missing_basis/input.inp",
+      "expect_ok": false,
+      "expect_codes": ["GAMESS603"]
+    },
+    {
+      "name": "guess_moread_no_vec",
+      "path": "tests/fixtures/preflight/guess_moread_no_vec/input.inp",
+      "expect_ok": false,
+      "expect_codes": ["GAMESS604"]
+    },
+    {
+      "name": "low_mwords",
+      "path": "tests/fixtures/preflight/low_mwords/input.inp",
+      "expect_ok": true,
+      "expect_codes": ["GAMESS606"]
+    },
+    {
+      "name": "method_basis_mismatch",
+      "path": "tests/fixtures/preflight/method_basis_mismatch/input.inp",
+      "expect_ok": false,
+      "expect_codes": ["GAMESS609"]
+    }
+  ]
+}
