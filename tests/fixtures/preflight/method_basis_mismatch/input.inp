@@ -1,0 +1,12 @@
+! MP2 correlated method paired with a minimal STO basis (schema mismatch)
+ $CONTRL SCFTYP=RHF RUNTYP=ENERGY MPLEVL=2 $END
+ $SYSTEM MWORDS=100 $END
+ $BASIS GBASIS=STO NGAUSS=3 $END
+ $DATA
+Water molecule
+C1
+
+O     8.0   0.000000   0.000000   0.117489
+H     1.0   0.000000   0.757210  -0.469957
+H     1.0   0.000000  -0.757210  -0.469957
+ $END

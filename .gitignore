@@ -71,3 +71,7 @@ venv.bak/
 .dmypy.json
 dmypy.json
 coverage.json
+
+# Agent worktrees
+.worktrees/
+

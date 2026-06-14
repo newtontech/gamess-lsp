@@ -1,0 +1,5 @@
+{
+  "software": "gamess",
+  "schema_source": "gamess-lsp builtin",
+  "ecutwfc_warning_ry_note": "GAMESS has no ecutwfc keyword; memory gating uses MWORDS instead."
+}
