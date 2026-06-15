@@ -10,7 +10,7 @@ entrypoints:
   server: gamess-lsp
   tool: gamess-lsp-tool
 file_patterns:
-  - *.inp
+  - "*.inp"
 operations:
   - capabilities
   - check
