@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gamess-lsp"
-version = "0.1.0"
+version = "0.1.1rc1"
 description = "Language Server Protocol for GAMESS input files"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -31,6 +31,10 @@ dev = [
 [project.scripts]
 gamess-lsp = "gamess_lsp.server:main"
 gamess-lsp-tool = "gamess_lsp.tool:main"
+
+
+[tool.hatch.build.force-include]
+"skill" = "skill"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/gamess_lsp"]
