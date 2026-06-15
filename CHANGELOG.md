@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- `VERSION` file and release metadata pointers in `lsp-capabilities.json` for
+  OpenQC provenance gates (#92).
 - **New Snippet Templates**: Added 4 new GAMESS calculation templates
   - Transition state search (SADPOINT optimization)
   - IRC calculation (Intrinsic Reaction Coordinate)
