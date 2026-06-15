@@ -1,4 +1,7 @@
-"""GAMESS Language Server Protocol implementation."""
+"""GAMESS Language Server Protocol implementation.
+
+See also: wiki/entities/LSP_Server.md
+"""
 
 import logging
 import os

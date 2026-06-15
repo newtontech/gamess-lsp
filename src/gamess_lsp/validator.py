@@ -1,5 +1,7 @@
 """Semantic validation rules for GAMESS input files.
 
+See also: wiki/synthesis/Diagnostics_Catalog.md
+
 This module provides physics/chemistry-aware validation that goes beyond
 syntax checking to detect semantically incorrect but syntactically valid inputs.
 

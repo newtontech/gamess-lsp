@@ -1,5 +1,7 @@
 """Machine-readable code-intelligence API for AI coding agents.
 
+See also: wiki/entities/OpenQC.md
+
 Exposes domain language descriptions (#58), section/keyword schema lookup (#59),
 minimal examples and next-token guidance (#60), and the OpenQC smoke capability (#76).
 """

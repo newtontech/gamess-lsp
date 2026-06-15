@@ -241,3 +241,6 @@ $CONTRL SCFTYP=RHF $END
 - `docs/DIAGNOSTIC_ENGINE_V1.md` - 诊断引擎规范
 - `src/gamess_lsp/validator.py` - 诊断实现
 - `src/gamess_lsp/rich_diagnostics.py` - 丰富诊断格式
+## Raw evidence
+
+- raw/assets/DIAGNOSTIC_ENGINE_V1.md

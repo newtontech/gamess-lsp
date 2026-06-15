@@ -1,5 +1,7 @@
 """LSP formatting provider for GAMESS input files.
 
+See also: wiki/synthesis/GAMESS_Input_Syntax.md
+
 This module provides document and range formatting for GAMESS input files,
 including group indentation, keyword normalization (uppercase), comment
 preservation, and $DATA section handling.

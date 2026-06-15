@@ -1,5 +1,7 @@
 """Universal generated-input preflight capabilities.
 
+See also: wiki/synthesis/openqc-agent-context.md
+
 This module implements the four fleet-wide preflight capabilities called out in
 ``newtontech/gamess-lsp#82`` against a *generic artifact-role model*, so the
 checks generalize to any backend in the scientific LSP fleet instead of being

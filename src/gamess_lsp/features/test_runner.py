@@ -1,4 +1,7 @@
-"""Optional test-runner / dry-run bridge for GAMESS."""
+"""Optional test-runner / dry-run bridge for GAMESS.
+
+See also: wiki/synthesis/openqc-agent-context.md
+"""
 
 from __future__ import annotations
 

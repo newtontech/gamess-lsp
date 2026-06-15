@@ -1,4 +1,7 @@
-"""Agent-facing CLI for Diagnostic Engine v1 operations."""
+"""Agent-facing CLI for Diagnostic Engine v1 operations.
+
+See also: wiki/entities/OpenQC.md
+"""
 
 from __future__ import annotations
 

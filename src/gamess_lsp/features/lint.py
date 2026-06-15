@@ -1,5 +1,7 @@
 """Schema-aware static lint rules for GAMESS input files.
 
+See also: wiki/synthesis/Diagnostics_Catalog.md
+
 Exposes ``LintProvider`` which produces LSP ``Diagnostic`` objects from
 deterministic, offline checks against the curated keyword metadata in
 :mod:`gamess_lsp.keywords`.  Every diagnostic carries a stable rule code

@@ -208,3 +208,6 @@ $DFT METHOD=GRID $END
 ## 来源 / Sources
 
 - `src/gamess_lsp/keywords.py` - DFT 组关键词
+## Raw evidence
+
+- raw/assets/README.md

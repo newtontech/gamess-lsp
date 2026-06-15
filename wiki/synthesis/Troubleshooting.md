@@ -312,3 +312,6 @@ $CONTRL ... $END
 
 - `src/gamess_lsp/keywords.py` - 关键词参考
 - `docs/DIAGNOSTIC_ENGINE_V1.md` - 诊断信息
+## Raw evidence
+
+- raw/assets/agent-verification-loop.md

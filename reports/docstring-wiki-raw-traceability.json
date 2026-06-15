@@ -1,0 +1,388 @@
+{
+  "docstrings": [
+    {
+      "path": "src/gamess_lsp/__init__.py",
+      "symbol": "__init__",
+      "wikiPath": "wiki/entities/GAMESS.md"
+    },
+    {
+      "path": "src/gamess_lsp/agent_lsp.py",
+      "symbol": "agent_lsp",
+      "wikiPath": "wiki/entities/LSP_Server.md"
+    },
+    {
+      "path": "src/gamess_lsp/agent_operations.py",
+      "symbol": "agent_operations",
+      "wikiPath": "wiki/entities/LSP_Server.md"
+    },
+    {
+      "path": "src/gamess_lsp/constants.py",
+      "symbol": "constants",
+      "wikiPath": "wiki/synthesis/GAMESS_Input_Syntax.md"
+    },
+    {
+      "path": "src/gamess_lsp/features/__init__.py",
+      "symbol": "__init__",
+      "wikiPath": "wiki/entities/LSP_Server.md"
+    },
+    {
+      "path": "src/gamess_lsp/features/agent_api.py",
+      "symbol": "agent_api",
+      "wikiPath": "wiki/entities/OpenQC.md"
+    },
+    {
+      "path": "src/gamess_lsp/features/diagnostic.py",
+      "symbol": "diagnostic",
+      "wikiPath": "wiki/entities/Diagnostic_Engine.md"
+    },
+    {
+      "path": "src/gamess_lsp/features/formatting.py",
+      "symbol": "formatting",
+      "wikiPath": "wiki/synthesis/GAMESS_Input_Syntax.md"
+    },
+    {
+      "path": "src/gamess_lsp/features/lint.py",
+      "symbol": "lint",
+      "wikiPath": "wiki/synthesis/Diagnostics_Catalog.md"
+    },
+    {
+      "path": "src/gamess_lsp/features/regression.py",
+      "symbol": "regression",
+      "wikiPath": "wiki/synthesis/Best_Practices.md"
+    },
+    {
+      "path": "src/gamess_lsp/features/test_runner.py",
+      "symbol": "test_runner",
+      "wikiPath": "wiki/synthesis/openqc-agent-context.md"
+    },
+    {
+      "path": "src/gamess_lsp/features/typecheck.py",
+      "symbol": "typecheck",
+      "wikiPath": "wiki/synthesis/GAMESS_Input_Syntax.md"
+    },
+    {
+      "path": "src/gamess_lsp/keywords.py",
+      "symbol": "keywords",
+      "wikiPath": "wiki/synthesis/GAMESS_Input_Syntax.md"
+    },
+    {
+      "path": "src/gamess_lsp/output_parser.py",
+      "symbol": "output_parser",
+      "wikiPath": "wiki/synthesis/Diagnostics_Catalog.md"
+    },
+    {
+      "path": "src/gamess_lsp/parser.py",
+      "symbol": "parser",
+      "wikiPath": "wiki/synthesis/GAMESS_Input_Syntax.md"
+    },
+    {
+      "path": "src/gamess_lsp/preflight.py",
+      "symbol": "preflight",
+      "wikiPath": "wiki/synthesis/openqc-agent-context.md"
+    },
+    {
+      "path": "src/gamess_lsp/rich_diagnostics.py",
+      "symbol": "rich_diagnostics",
+      "wikiPath": "wiki/entities/Diagnostic_Engine.md"
+    },
+    {
+      "path": "src/gamess_lsp/server.py",
+      "symbol": "server",
+      "wikiPath": "wiki/entities/LSP_Server.md"
+    },
+    {
+      "path": "src/gamess_lsp/tokenizer.py",
+      "symbol": "tokenizer",
+      "wikiPath": "wiki/synthesis/GAMESS_Input_Syntax.md"
+    },
+    {
+      "path": "src/gamess_lsp/tool.py",
+      "symbol": "tool",
+      "wikiPath": "wiki/entities/OpenQC.md"
+    },
+    {
+      "path": "src/gamess_lsp/validator.py",
+      "symbol": "validator",
+      "wikiPath": "wiki/synthesis/Diagnostics_Catalog.md"
+    }
+  ],
+  "generatedAt": "2026-06-15T20:21:20.322789+00:00",
+  "languageId": "gamess",
+  "rawManifest": {
+    "ok": true,
+    "path": "raw/assets/manifest.json"
+  },
+  "repository": "newtontech/gamess-lsp",
+  "ruleIds": [
+    {
+      "code": "GAMESS-INPUT-STRUCTURE-001",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-INPUT-STRUCTURE-002",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-INPUT-SCHEMA-001",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-INPUT-SCHEMA-002",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-INPUT-SCHEMA-003",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-INPUT-SCHEMA-004",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-INPUT-SCHEMA-005",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-INPUT-BESTPRAC-001",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-INPUT-BESTPRAC-002",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-INPUT-BESTPRAC-003",
+      "sourcePath": "src/gamess_lsp/features/lint.py"
+    },
+    {
+      "code": "GAMESS-DIAG-SYNTAX-001",
+      "sourcePath": "src/gamess_lsp/features/diagnostic.py"
+    },
+    {
+      "code": "GAMESS-DIAG-SEMANTIC-001",
+      "sourcePath": "src/gamess_lsp/features/diagnostic.py"
+    },
+    {
+      "code": "GAMESS-DIAG-TYPECHECK-001",
+      "sourcePath": "src/gamess_lsp/features/typecheck.py"
+    },
+    {
+      "code": "GAMESS-OUTPUT-RUNTIME-001",
+      "sourcePath": "src/gamess_lsp/output_parser.py"
+    },
+    {
+      "code": "GAMESS-PREFLIGHT-ENVELOPE-001",
+      "sourcePath": "src/gamess_lsp/preflight.py"
+    }
+  ],
+  "schemaVersion": "openqc.lsp.traceability.v1",
+  "serverId": "gamess-lsp",
+  "sourceUrls": [
+    {
+      "rawPath": "raw/assets/DIAGNOSTIC_ENGINE_V1.md",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/DIAGNOSTIC_ENGINE_V1.md"
+    },
+    {
+      "rawPath": "raw/assets/OPENQC_ALIGNMENT.md",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/OPENQC_ALIGNMENT.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md"
+    },
+    {
+      "rawPath": "raw/assets/agent-verification-loop.md",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/agent-verification-loop.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/README.md",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/README.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/h2o_freq.inp",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/h2o_freq.inp"
+    },
+    {
+      "rawPath": "raw/assets/examples/irc_reaction.inp",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/irc_reaction.inp"
+    },
+    {
+      "rawPath": "raw/assets/examples/mp2_energy.inp",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/mp2_energy.inp"
+    },
+    {
+      "rawPath": "raw/assets/examples/tddft_excited.inp",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/tddft_excited.inp"
+    },
+    {
+      "rawPath": "raw/assets/examples/water_dft.inp",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/water_dft.inp"
+    },
+    {
+      "rawPath": "raw/assets/manifest.json",
+      "url": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/manifest.json"
+    }
+  ],
+  "summary": {
+    "brokenWikiLinks": 0,
+    "docstringsLinked": 21,
+    "docstringsTotal": 21,
+    "rawManifestFailures": 0,
+    "ruleIdsTotal": 15,
+    "sourceUrlsTotal": 11,
+    "wikiSourcesTotal": 30,
+    "wikiSourcesWithoutRaw": 0
+  },
+  "wikiSources": [
+    {
+      "rawPath": "raw/assets/examples/water_dft.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/water_dft.inp",
+      "wikiPath": "wiki/concepts/Basis_Sets.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/",
+      "wikiPath": "wiki/concepts/Calculation_Types.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md",
+      "wikiPath": "wiki/concepts/DFT_Functionals.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/",
+      "wikiPath": "wiki/concepts/Electronic_Structure_Methods.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/tddft_excited.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/tddft_excited.inp",
+      "wikiPath": "wiki/concepts/Excited_States.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/h2o_freq.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/h2o_freq.inp",
+      "wikiPath": "wiki/concepts/Frequency_Calculation.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/water_dft.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/water_dft.inp",
+      "wikiPath": "wiki/concepts/Geometry_Optimization.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/water_dft.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/water_dft.inp",
+      "wikiPath": "wiki/concepts/Molecular_Orbitals.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/water_dft.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/water_dft.inp",
+      "wikiPath": "wiki/concepts/Molecular_Symmetry.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/water_dft.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/water_dft.inp",
+      "wikiPath": "wiki/concepts/SCF_Convergence.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/water_dft.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/water_dft.inp",
+      "wikiPath": "wiki/concepts/Solvation_Models.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/h2o_freq.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/h2o_freq.inp",
+      "wikiPath": "wiki/concepts/Thermodynamics.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/irc_reaction.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/irc_reaction.inp",
+      "wikiPath": "wiki/concepts/Transition_State_Search.md"
+    },
+    {
+      "rawPath": "raw/assets/DIAGNOSTIC_ENGINE_V1.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/DIAGNOSTIC_ENGINE_V1.md",
+      "wikiPath": "wiki/concepts/diagnostic-engine-v1.md"
+    },
+    {
+      "rawPath": "raw/assets/DIAGNOSTIC_ENGINE_V1.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/DIAGNOSTIC_ENGINE_V1.md",
+      "wikiPath": "wiki/entities/Diagnostic_Engine.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md",
+      "wikiPath": "wiki/entities/GAMESS.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/water_dft.inp",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/water_dft.inp",
+      "wikiPath": "wiki/entities/GAMESS.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md",
+      "wikiPath": "wiki/entities/LSP_Server.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md",
+      "wikiPath": "wiki/entities/OpenQC.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md",
+      "wikiPath": "wiki/synthesis/Best_Practices.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/",
+      "wikiPath": "wiki/synthesis/Best_Practices.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md",
+      "wikiPath": "wiki/synthesis/Code_Snippets.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/",
+      "wikiPath": "wiki/synthesis/Code_Snippets.md"
+    },
+    {
+      "rawPath": "raw/assets/DIAGNOSTIC_ENGINE_V1.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/DIAGNOSTIC_ENGINE_V1.md",
+      "wikiPath": "wiki/synthesis/Diagnostics_Catalog.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md",
+      "wikiPath": "wiki/synthesis/GAMESS_Input_Syntax.md"
+    },
+    {
+      "rawPath": "raw/assets/examples/",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/examples/",
+      "wikiPath": "wiki/synthesis/GAMESS_Input_Syntax.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md",
+      "wikiPath": "wiki/synthesis/LSP_Capabilities.md"
+    },
+    {
+      "rawPath": "raw/assets/README.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/README.md",
+      "wikiPath": "wiki/synthesis/Migration_Guide.md"
+    },
+    {
+      "rawPath": "raw/assets/agent-verification-loop.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/agent-verification-loop.md",
+      "wikiPath": "wiki/synthesis/Troubleshooting.md"
+    },
+    {
+      "rawPath": "raw/assets/OPENQC_ALIGNMENT.md",
+      "sourceUrl": "https://github.com/newtontech/gamess-lsp/blob/main/raw/assets/OPENQC_ALIGNMENT.md",
+      "wikiPath": "wiki/synthesis/openqc-agent-context.md"
+    }
+  ]
+}

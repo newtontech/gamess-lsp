@@ -1,4 +1,7 @@
-"""Small Python API wrapper around the Diagnostic Engine v1 CLI contract."""
+"""Small Python API wrapper around the Diagnostic Engine v1 CLI contract.
+
+See also: wiki/entities/LSP_Server.md
+"""
 
 from __future__ import annotations
 

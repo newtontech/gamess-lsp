@@ -1,5 +1,7 @@
 """Shared tokenizer for GAMESS keyword/value parsing.
 
+See also: wiki/synthesis/GAMESS_Input_Syntax.md
+
 Provides both low-level line tokenization and higher-level keyword=value
 pair extraction, eliminating duplication between parser and formatter
 (issue #66).
