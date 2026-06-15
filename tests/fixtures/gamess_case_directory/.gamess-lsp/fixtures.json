@@ -1,0 +1,8 @@
+[
+  {
+    "name": "valid_dft_optimize",
+    "path": "tests/fixtures/gamess_case_directory/input.inp",
+    "expect_ok": true,
+    "expect_codes": []
+  }
+]
