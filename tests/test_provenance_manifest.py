@@ -34,6 +34,14 @@ def test_lsp_capabilities_lists_source_provenance() -> None:
     assert len(caps.get("outputLogPatterns", [])) >= 1
 
 
+def test_lsp_capabilities_fixture_paths_exist() -> None:
+    caps = json.loads((REPO_ROOT / "lsp-capabilities.json").read_text(encoding="utf-8"))
+    for category in ("valid", "invalid", "logs"):
+        paths = caps.get("fixturePaths", {}).get(category, [])
+        assert paths, f"fixturePaths.{category} must be non-empty"
+        assert any((REPO_ROOT / rel).exists() for rel in paths), category
+
+
 def test_refresh_provenance_manifest_is_idempotent() -> None:
     before = json.loads((REPO_ROOT / "raw/assets/manifest.json").read_text(encoding="utf-8"))
     subprocess.run(
