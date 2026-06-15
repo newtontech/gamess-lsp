@@ -1,0 +1,140 @@
+{
+  "manifest_version": "1.0.0",
+  "schema_version": "provenance-manifest-v1",
+  "created_at": "2026-06-15T08:49:59+00:00",
+  "repository": "newtontech/gamess-lsp",
+  "pipeline": "official-docs -> raw/assets -> wiki/entities+concepts+synthesis -> versioned schema/rules -> provenance -> fixtures/eval -> LSP runtime/OpenQC integration",
+  "official_source_anchors": [
+    {
+      "name": "GAMESS input documentation",
+      "type": "official_docs",
+      "url": "https://www.msg.chem.iastate.edu/gamess/documentation.html",
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "academic use",
+      "notes": "Primary keyword and $GROUP reference"
+    }
+  ],
+  "entries": [
+    {
+      "path": "DIAGNOSTIC_ENGINE_V1.md",
+      "source_type": "internal_doc",
+      "source_url": null,
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "internal",
+      "checksum_sha256": "2f61fe4b1c64001fd95ccc717fde3db5ee0f73d2bc83f2b798adfc20ef3047d7",
+      "stable_id": "gamess-diagnostic_engine_v1-md-v1",
+      "role": "architecture_doc",
+      "wiki_links": []
+    },
+    {
+      "path": "OPENQC_ALIGNMENT.md",
+      "source_type": "internal_doc",
+      "source_url": null,
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "internal",
+      "checksum_sha256": "856f9c62c157a4136d427d236debd8b5bf4727c602c82ffcd88a674880f5b5a8",
+      "stable_id": "gamess-openqc_alignment-md-v1",
+      "role": "integration_contract",
+      "wiki_links": []
+    },
+    {
+      "path": "README.md",
+      "source_type": "internal_doc",
+      "source_url": null,
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "internal",
+      "checksum_sha256": "5a155a32fe43c2d4217015304227dbb1e8d70c932e131aebbf496693fda90c88",
+      "stable_id": "gamess-readme-md-v1",
+      "role": "overview",
+      "wiki_links": []
+    },
+    {
+      "path": "agent-verification-loop.md",
+      "source_type": "internal_doc",
+      "source_url": null,
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "internal",
+      "checksum_sha256": "fa9a1723fffb7c5f0fb6034d9d1a3f90f933b0e54250487ca63c9dc09a5f6dd5",
+      "stable_id": "gamess-agent-verification-loop-md-v1",
+      "role": "quality_doc",
+      "wiki_links": []
+    },
+    {
+      "path": "examples/README.md",
+      "source_type": "official_docs",
+      "source_url": "https://www.msg.chem.iastate.edu/gamess/documentation.html",
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "MIT",
+      "checksum_sha256": "4c2a4480580f0d4cb758b615e0f9a6308b449a469854740c25d73c94db37756d",
+      "stable_id": "gamess-examples-readme-md-v1",
+      "role": "overview",
+      "wiki_links": []
+    },
+    {
+      "path": "examples/h2o_freq.inp",
+      "source_type": "official_docs",
+      "source_url": "https://www.msg.chem.iastate.edu/gamess/documentation.html",
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "MIT",
+      "checksum_sha256": "4c5458d49dc96b19e7b0dbc6d232238f5b4d4ff2a79054790f4ba68c0d157730",
+      "stable_id": "gamess-examples-h2o_freq-inp-v1",
+      "role": "examples",
+      "wiki_links": []
+    },
+    {
+      "path": "examples/irc_reaction.inp",
+      "source_type": "official_docs",
+      "source_url": "https://www.msg.chem.iastate.edu/gamess/documentation.html",
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "MIT",
+      "checksum_sha256": "a6f1d0f6cc7ae508a5b43399029cb49f5c26d43573e64182274a706d053481ef",
+      "stable_id": "gamess-examples-irc_reaction-inp-v1",
+      "role": "examples",
+      "wiki_links": []
+    },
+    {
+      "path": "examples/mp2_energy.inp",
+      "source_type": "official_docs",
+      "source_url": "https://www.msg.chem.iastate.edu/gamess/documentation.html",
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "MIT",
+      "checksum_sha256": "2ffc35743835534b724e19c86afce27b2b8113da9bca9fee160d6d89e66b1c3f",
+      "stable_id": "gamess-examples-mp2_energy-inp-v1",
+      "role": "examples",
+      "wiki_links": []
+    },
+    {
+      "path": "examples/tddft_excited.inp",
+      "source_type": "official_docs",
+      "source_url": "https://www.msg.chem.iastate.edu/gamess/documentation.html",
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "MIT",
+      "checksum_sha256": "dcf96f4e6cb8c1da786bfb4ee60838f773ba51edac5a1662d6264b7741a38c55",
+      "stable_id": "gamess-examples-tddft_excited-inp-v1",
+      "role": "examples",
+      "wiki_links": []
+    },
+    {
+      "path": "examples/water_dft.inp",
+      "source_type": "official_docs",
+      "source_url": "https://www.msg.chem.iastate.edu/gamess/documentation.html",
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "MIT",
+      "checksum_sha256": "c9c1729b0921a529d4b0bb0ad96fb4b75557717240f75e20eed3dec402beaeea",
+      "stable_id": "gamess-examples-water_dft-inp-v1",
+      "role": "examples",
+      "wiki_links": []
+    }
+  ]
+}
