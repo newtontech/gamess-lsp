@@ -17,7 +17,10 @@ def _capabilities_payload() -> dict[str, Any]:
     for parent in Path(__file__).resolve().parents:
         manifest_path = parent / "lsp-capabilities.json"
         if manifest_path.exists():
-            return json.loads(manifest_path.read_text(encoding="utf-8"))
+            payload: dict[str, Any] = json.loads(
+                manifest_path.read_text(encoding="utf-8")
+            )
+            return payload
     return {
         "schema": "OpenQCLspCapabilities",
         "version": 1,
@@ -31,6 +34,7 @@ def _capabilities_payload() -> dict[str, Any]:
             "fix-preview",
             "llm-wiki",
             "openqc-context",
+            "output-log-diagnostics",
         ],
         "agentCli": {
             "operations": [
@@ -41,6 +45,7 @@ def _capabilities_payload() -> dict[str, Any]:
                 "hover",
                 "symbols",
                 "fix",
+                "log",
             ],
             "jsonFormat": True,
             "failOnBlocking": True,
@@ -234,6 +239,65 @@ def manifest_path(path: Path | None = None) -> dict[str, Any]:
     return fleet_manifest(fixtures=fixtures)
 
 
+def log_path(path: Path) -> dict[str, Any]:
+    """Return a DiagnosticEnvelope/v1 payload for a GAMESS output/log file.
+
+    Parses GAMESS runtime output files (.log, .out) to extract diagnostics
+    about calculation success, convergence issues, memory errors, and other
+    runtime events.
+    """
+    from .output_parser import diagnostic_to_dict, parse_output_file
+
+    path = Path(path)
+    if not path.exists():
+        return with_capabilities(
+            agent_check_payload(
+                software=SOFTWARE,
+                uri=path.resolve().as_uri(),
+                operation="log",
+                diagnostics=[],
+                path=str(path),
+                file_type=_file_type(path),
+            ),
+            "log",
+            status="unavailable",
+            reason=f"File not found: {path}",
+        )
+
+    if not path.is_file():
+        return with_capabilities(
+            agent_check_payload(
+                software=SOFTWARE,
+                uri=path.resolve().as_uri(),
+                operation="log",
+                diagnostics=[],
+                path=str(path),
+                file_type="directory",
+            ),
+            "log",
+            status="unavailable",
+            reason="Log operation requires a file path, not a directory",
+        )
+
+    output_diagnostics = parse_output_file(path)
+    diagnostics = [diagnostic_to_dict(d) for d in output_diagnostics]
+
+    payload = agent_check_payload(
+        software=SOFTWARE,
+        uri=path.resolve().as_uri(),
+        operation="log",
+        diagnostics=diagnostics,
+        path=str(path),
+        file_type=_file_type(path),
+    )
+
+    payload["output_type"] = "gamess-log"
+    payload["has_errors"] = any(d["severity"] == "error" for d in diagnostics)
+    payload["has_warnings"] = any(d["severity"] == "warning" for d in diagnostics)
+
+    return with_capabilities(payload, "log")
+
+
 def _operation_payload(
     path: Path,
     operation: str,
@@ -265,6 +329,7 @@ def main(argv: list[str] | None = None) -> int:
         "hover",
         "symbols",
         "fix",
+        "log",
     ):
         sub = subparsers.add_parser(operation)
         if operation == "manifest":
@@ -310,6 +375,10 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.operation == "manifest":
         payload = manifest_path(getattr(args, "path", None))
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return 0
+    if args.operation == "log":
+        payload = log_path(args.path)
         print(json.dumps(payload, indent=2, sort_keys=True))
         return 0
     payload = _operation_payload(args.path, args.operation, args.line, args.character)

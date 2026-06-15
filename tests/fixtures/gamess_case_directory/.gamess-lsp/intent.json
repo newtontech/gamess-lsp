@@ -1,0 +1,5 @@
+{
+  "software_version": "gamess >=2024",
+  "mwords_warning": 2.0,
+  "runtime_image": "img:2024"
+}

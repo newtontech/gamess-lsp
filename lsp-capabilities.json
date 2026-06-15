@@ -29,6 +29,7 @@
     "manifest",
     "navigation",
     "openqc-context",
+    "output-log-diagnostics",
     "references-or-rename-where-implemented",
     "rich-diagnostics",
     "routing",
@@ -44,7 +45,8 @@
       "complete",
       "hover",
       "symbols",
-      "fix"
+      "fix",
+      "log"
     ],
     "jsonFormat": true,
     "failOnBlocking": true
