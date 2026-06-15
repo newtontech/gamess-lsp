@@ -16,6 +16,17 @@ All notable changes to this project will be documented in this file.
 - CI now enstrict test failures (no longer masks failures)
 - Dependency version constraints tightened for stability
 
+## [Unreleased]
+
+### Added
+- `raw/assets/manifest.json` with checksums, stable IDs, and official source anchors (#84).
+- `scripts/refresh_provenance_manifest.py` to regenerate the provenance manifest without hand-editing pages.
+- Expanded `lsp-capabilities.json` `sourceProvenance` and `outputLogPatterns` for traceable diagnostics.
+- `tests/test_provenance_manifest.py` for manifest/capabilities contract checks.
+
+### Fixed
+- `scripts/test.sh` uses `python3` via `PYTHON_BIN` so CI/local gates work on macOS without a `python` shim.
+
 ## [0.2.4] - 2026-03-05
 
 ### Fixed

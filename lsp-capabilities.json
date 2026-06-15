@@ -75,18 +75,71 @@
       "test/fixtures/logs"
     ]
   },
-  "outputLogPatterns": [],
+  "outputLogPatterns": [
+    {
+      "code": "GAMESS-OUT-001",
+      "severity": "error",
+      "description": "SCF convergence failure in GAMESS log output",
+      "manifest_entry": "gamess-output-parser-v1"
+    },
+    {
+      "code": "GAMESS-OUT-002",
+      "severity": "error",
+      "description": "Memory allocation failure in GAMESS log output",
+      "manifest_entry": "gamess-output-parser-v1"
+    },
+    {
+      "code": "GAMESS-OUT-005",
+      "severity": "info",
+      "description": "Successful GAMESS calculation completion marker",
+      "manifest_entry": "gamess-output-parser-v1"
+    }
+  ],
   "openqc": {
     "registryId": "gamess-lsp",
     "repoName": "gamess-lsp",
     "contextContract": "DSLAuthoringContext",
-    "diagnosticEnvelope": "DiagnosticEnvelope/v1"
+    "diagnosticEnvelope": "DiagnosticEnvelope/v1",
+    "refreshManifest": "python3 scripts/refresh_provenance_manifest.py"
   },
   "sourceProvenance": [
     {
       "kind": "official_docs",
       "label": "GAMESS input documentation",
-      "url": "https://www.msg.chem.iastate.edu/gamess/documentation.html"
+      "url": "https://www.msg.chem.iastate.edu/gamess/documentation.html",
+      "retrieval_date": "2026-06-15",
+      "software_version": "GAMESS (US) 2024 R1",
+      "license": "academic use",
+      "manifest_entry": "gamess-raw-assets-readme-md-v1",
+      "diagnostic_codes_sourced": [
+        "LINT_UNCLOSED_GROUP",
+        "GAMESS601",
+        "LINT_INVALID_ENUM",
+        "GAMESS-OUT-001",
+        "GAMESS-OUT-002"
+      ],
+      "wiki_links": [
+        "wiki/synthesis/Diagnostics_Catalog.md",
+        "wiki/synthesis/GAMESS_Input_Syntax.md"
+      ]
+    },
+    {
+      "kind": "internal_doc",
+      "label": "Diagnostic Engine v1",
+      "path": "raw/assets/DIAGNOSTIC_ENGINE_V1.md",
+      "manifest_entry": "gamess-diagnostic-engine-v1-md-v1",
+      "diagnostic_codes_sourced": ["all"]
+    },
+    {
+      "kind": "internal_doc",
+      "label": "Lint provider rules",
+      "path": "src/gamess_lsp/features/lint.py",
+      "manifest_entry": null,
+      "diagnostic_codes_sourced": [
+        "LINT_UNCLOSED_GROUP",
+        "GAMESS601",
+        "LINT_INVALID_ENUM"
+      ]
     }
   ]
 }
