@@ -1,0 +1,30 @@
+schema: scientific-lsp-skill/v1
+name: gamess
+software: gamess
+display_name: GAMESS
+description: GAMESS input preflight for generated .inp job files.
+package:
+  name: gamess-lsp
+  install: pip install gamess-lsp
+entrypoints:
+  server: gamess-lsp
+  tool: gamess-lsp-tool
+file_patterns:
+  - *.inp
+operations:
+  - capabilities
+  - check
+  - context
+  - complete
+  - hover
+  - symbols
+  - fix
+diagnostic_contract: DiagnosticEnvelope/v1
+blocking_policy:
+  mode: warning-only
+  description: Use --fail-on-blocking when generated inputs must be launch-ready.
+source_provenance:
+  -
+    kind: official_docs
+    label: GAMESS input documentation
+    url: https://www.msg.chem.iastate.edu/gamess/documentation.html
