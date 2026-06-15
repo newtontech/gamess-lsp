@@ -1,5 +1,7 @@
 """LSP diagnostic provider for GAMESS input files.
 
+See also: wiki/entities/Diagnostic_Engine.md
+
 Exposes live diagnostics snapshots suitable for both LSP clients and
 machine-readable agent feedback loops.
 """

@@ -1,4 +1,7 @@
-"""Regression harness for golden diagnostics, formatting, and code actions."""
+"""Regression harness for golden diagnostics, formatting, and code actions.
+
+See also: wiki/synthesis/Best_Practices.md
+"""
 
 from __future__ import annotations
 

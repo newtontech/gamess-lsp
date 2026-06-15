@@ -116,3 +116,6 @@ $PCM SOLVNT=WATER $END
 ## 来源 / Sources
 
 - `src/gamess_lsp/keywords.py` - PCM, COSMO, SMD 关键词
+## Raw evidence
+
+- raw/assets/examples/water_dft.inp

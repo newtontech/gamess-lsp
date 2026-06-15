@@ -1,4 +1,7 @@
-"""GAMESS input file parser."""
+"""GAMESS input file parser.
+
+See also: wiki/synthesis/GAMESS_Input_Syntax.md
+"""
 
 import re
 from dataclasses import dataclass, field

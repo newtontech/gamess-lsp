@@ -247,3 +247,6 @@ $CONTRL MAXIT=200 $END
 
 - `src/gamess_lsp/keywords.py` - SCF, CONTRL 组关键词
 - `docs/DIAGNOSTIC_ENGINE_V1.md` - 诊断信息
+## Raw evidence
+
+- raw/assets/examples/water_dft.inp

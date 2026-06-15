@@ -1,5 +1,7 @@
 """Shared agent-facing operations for Diagnostic Engine v1 CLIs.
 
+See also: wiki/entities/LSP_Server.md
+
 The editor servers already own the expensive parsing and validation logic. This
 module exposes the same information in a command-line friendly JSON shape for
 agents that need LSP-style context without starting an editor client.

@@ -82,3 +82,6 @@ gamess-lsp-tool fix path/to/input --format json
 ## 历史更新 / History
 
 - 2026-06-12: 创建诊断引擎实体页面
+## Raw evidence
+
+- raw/assets/DIAGNOSTIC_ENGINE_V1.md

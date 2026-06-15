@@ -215,3 +215,6 @@ $VEC
 ## 来源 / Sources
 
 - `src/gamess_lsp/keywords.py` - GUESS, VEC 组关键词
+## Raw evidence
+
+- raw/assets/examples/water_dft.inp

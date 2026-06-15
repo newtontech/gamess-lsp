@@ -1,5 +1,7 @@
 """Type-checking validation for GAMESS keyword values.
 
+See also: wiki/synthesis/GAMESS_Input_Syntax.md
+
 Validates keyword value types (integer, float, boolean, enum, string),
 checks enum membership against the keyword database, validates units where
 applicable, and reports missing required sections.

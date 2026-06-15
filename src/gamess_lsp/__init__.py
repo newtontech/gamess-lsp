@@ -1,4 +1,7 @@
-"""GAMESS Language Server Protocol implementation."""
+"""GAMESS Language Server Protocol implementation.
+
+See also: wiki/entities/GAMESS.md
+"""
 
 __version__ = "0.1.0"
 

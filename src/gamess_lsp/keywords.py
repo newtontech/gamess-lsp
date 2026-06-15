@@ -1,4 +1,7 @@
-"""GAMESS keywords database."""
+"""GAMESS keywords database.
+
+See also: wiki/synthesis/GAMESS_Input_Syntax.md
+"""
 
 GAMESS_GROUPS = {
     "CONTRL": """$CONTRL group - Main control options for GAMESS calculation.

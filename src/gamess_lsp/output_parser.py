@@ -1,5 +1,7 @@
 """GAMESS output/log file parser for runtime diagnostics.
 
+See also: wiki/synthesis/Diagnostics_Catalog.md
+
 This module parses GAMESS output files (.log, .out) to extract runtime
 diagnostics, warnings, and error information that can be used by the LSP
 to provide feedback on calculation issues.

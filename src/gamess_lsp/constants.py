@@ -1,4 +1,7 @@
-"""Shared constants for GAMESS LSP."""
+"""Shared constants for GAMESS LSP.
+
+See also: wiki/synthesis/GAMESS_Input_Syntax.md
+"""
 
 # Atomic numbers for elements H through U
 ELEMENT_ATOMIC_NUMBERS = {
