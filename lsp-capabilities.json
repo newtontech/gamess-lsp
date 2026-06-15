@@ -116,7 +116,10 @@
         "GAMESS601",
         "LINT_INVALID_ENUM",
         "GAMESS-OUT-001",
-        "GAMESS-OUT-002"
+        "GAMESS-OUT-002",
+        "OPEN_SHELL_RHF",
+        "INCOMPAT_DFT_MP2",
+        "SCFTYP_MULT_INCOMPAT"
       ],
       "wiki_links": [
         "wiki/synthesis/Diagnostics_Catalog.md",

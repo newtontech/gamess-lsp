@@ -55,11 +55,14 @@ class TestFixOperation:
             assert "safe_to_auto_apply" in action
             assert "edit" in action
 
-    def test_fix_operation_on_valid_fixture_has_no_actions(self, capsys) -> None:
+    def test_fix_operation_on_valid_fixture_has_preview_only_actions(self, capsys) -> None:
         rc = tool.main(["fix", str(FIXTURES / "valid_water_dft.inp")])
         assert rc == 0
         payload = json.loads(capsys.readouterr().out)
-        assert payload["actions"] == []
+        for action in payload["actions"]:
+            assert action["safe_to_auto_apply"] is False
+            assert action["edit"] is None
+            assert action["blocking"] is False
 
     def test_fix_operation_returns_diagnostic_envelope_v1(self, capsys) -> None:
         rc = tool.main(["fix", str(FIXTURES / "invalid_missing_contrl.inp")])
@@ -76,7 +79,7 @@ class TestFixOperation:
         assert payload["capabilities"]["status"] == "available"
 
     def test_fix_operation_status_unavailable_when_no_actions(self, capsys) -> None:
-        rc = tool.main(["fix", str(FIXTURES / "valid_hf_sp.inp")])
+        rc = tool.main(["fix", str(FIXTURES / "nonexistent.inp")])
         assert rc == 0
         payload = json.loads(capsys.readouterr().out)
         assert payload["capabilities"]["status"] == "unavailable"
@@ -264,3 +267,56 @@ class TestOpenQCSmokeEvidence:
         assert payload["diagnostic_engine"] == "1.0"
         assert payload["software"] == "gamess"
         assert payload["capabilities"]["operation"] == "check"
+
+
+class TestSemanticClosedLoopFixtures:
+    """Runtime semantic failures suggested in issue #90."""
+
+    def test_rhf_open_shell_mult2_emits_semantic_codes(self, capsys) -> None:
+        rc = tool.main(["check", str(FIXTURES / "invalid_rhf_mult2.inp")])
+        assert rc == 0
+        payload = json.loads(capsys.readouterr().out)
+        codes = {d["code"] for d in payload["diagnostics"]}
+        assert "OPEN_SHELL_RHF" in codes
+        assert payload["ok"] is False
+
+    def test_dft_mp2_conflict_emits_incompat_code(self, capsys) -> None:
+        rc = tool.main(["check", str(FIXTURES / "invalid_dft_mp2_conflict.inp")])
+        assert rc == 0
+        payload = json.loads(capsys.readouterr().out)
+        codes = {d["code"] for d in payload["diagnostics"]}
+        assert "INCOMPAT_DFT_MP2" in codes
+
+
+class TestFixRepairPreviewRefusal:
+    """Unsafe or ambiguous repairs stay preview-only (issue #90)."""
+
+    def test_fix_refuses_auto_apply_for_semantic_conflicts(self, capsys) -> None:
+        rc = tool.main(["fix", str(FIXTURES / "invalid_dft_mp2_conflict.inp")])
+        assert rc == 0
+        payload = json.loads(capsys.readouterr().out)
+        assert payload["actions"]
+        for action in payload["actions"]:
+            assert action["safe_to_auto_apply"] is False
+            assert action["edit"] is None
+
+    def test_fix_matches_check_diagnostics_for_workspace_inp(self, capsys) -> None:
+        """Fix must see the same diagnostics as check for .inp workspaces."""
+        rc = tool.main(["fix", str(FIXTURES / "invalid_rhf_mult2.inp")])
+        assert rc == 0
+        payload = json.loads(capsys.readouterr().out)
+        codes = {a["diagnostic_code"] for a in payload["actions"]}
+        assert "OPEN_SHELL_RHF" in codes
+
+
+class TestFixturePathManifest:
+    """OpenQC fixture path contract (issues #84, #85)."""
+
+    def test_lsp_capabilities_fixture_paths_exist(self) -> None:
+        repo_root = Path(__file__).parent.parent
+        caps = json.loads((repo_root / "lsp-capabilities.json").read_text(encoding="utf-8"))
+        for category in ("valid", "invalid", "logs"):
+            paths = caps["fixturePaths"][category]
+            assert any((repo_root / rel).exists() for rel in paths), category
+            resolved = next(repo_root / rel for rel in paths if (repo_root / rel).exists())
+            assert any(resolved.iterdir()), f"{category} fixture dir is empty"

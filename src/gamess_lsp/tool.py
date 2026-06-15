@@ -136,10 +136,20 @@ def _resolve_input_path(path: Path) -> Path:
     return path
 
 
+def _collect_check_diagnostics(path: Path) -> list[Any]:
+    """Collect the same diagnostics as ``check_path`` for fix/context/hover."""
+    intent = _load_intent(path)
+    diagnostics = _collect_diagnostics(path) if path.is_file() else []
+    if _looks_like_workspace(path):
+        preflight, _, _ = _collect_preflight(path, intent)
+        diagnostics.extend(_dedupe_preflight(diagnostics, preflight))
+    return diagnostics
+
+
 def check_path(path: Path) -> dict[str, Any]:
     uri = path.resolve().as_uri()
     intent = _load_intent(path)
-    diagnostics = _collect_diagnostics(path) if path.is_file() else []
+    diagnostics = _collect_check_diagnostics(path)
     # Universal preflight diagnostics augment the legacy analyzer output, but
     # only for a real generated-input workspace (a directory or .inp). A bare
     # single non-GAMESS file path keeps the legacy single-file behavior so
@@ -147,8 +157,7 @@ def check_path(path: Path) -> dict[str, Any]:
     artifacts: list[dict[str, Any]] = []
     version_assumption: dict[str, Any] | None = None
     if _looks_like_workspace(path):
-        preflight, artifacts, version_assumption = _collect_preflight(path, intent)
-        diagnostics.extend(_dedupe_preflight(diagnostics, preflight))
+        _, artifacts, version_assumption = _collect_preflight(path, intent)
     payload = agent_check_payload(
         software=SOFTWARE,
         uri=uri,
@@ -309,7 +318,7 @@ def _operation_payload(
         operation,
         software=SOFTWARE,
         file_type_func=_file_type,
-        collect_diagnostics=_collect_diagnostics,
+        collect_diagnostics=_collect_check_diagnostics,
         line=line,
         character=character,
     )
