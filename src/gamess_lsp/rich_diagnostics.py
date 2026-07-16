@@ -9,7 +9,7 @@ python-lsp-server-style provider boundary for agent-facing JSON consumers.
 from __future__ import annotations
 
 from dataclasses import asdict, is_dataclass
-from typing import Any, Iterable
+from typing import Any, Iterable, cast
 
 DIAGNOSTIC_ENGINE_VERSION = "1.0"
 # Normalized cross-fleet preflight envelope. Parent routers (bohrium_skills)
@@ -89,7 +89,7 @@ def _legacy_payload(obj: Any) -> dict[str, Any]:
     if isinstance(obj, dict):
         return dict(obj)
     if is_dataclass(obj):
-        return asdict(obj)
+        return asdict(cast(Any, obj))
     to_json = getattr(obj, "to_json", None)
     if callable(to_json):
         try:

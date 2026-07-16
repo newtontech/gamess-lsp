@@ -3,12 +3,14 @@
 See also: wiki/entities/LSP_Server.md
 """
 
+import argparse
 import logging
 import os
 import re
+import sys
 from collections import OrderedDict
 from difflib import get_close_matches
-from typing import Any, List, Optional
+from typing import Any, ItemsView, List, Optional
 from urllib.parse import urlparse
 
 from lsprotocol.types import (
@@ -46,10 +48,11 @@ from lsprotocol.types import (
 from pygls.server import LanguageServer
 from pygls.workspace import Document
 
+from . import __version__
 from .features.diagnostic import DiagnosticProvider
 from .features.formatting import FormattingProvider
-from .features.typecheck import TypecheckProvider
 from .features.lint import LintProvider
+from .features.typecheck import TypecheckProvider
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from .parser import GAMESSParser
 from .validator import validate_semantics
@@ -61,7 +64,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-server = LanguageServer("gamess-lsp", "0.1.0")
+server = LanguageServer("gamess-lsp", __version__)
 
 # Resource limits for DoS protection
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
@@ -108,7 +111,7 @@ class DocumentCache:
         """Clear the cache."""
         self._cache.clear()
 
-    def items(self):
+    def items(self) -> ItemsView[str, str]:
         """Return cache items."""
         return self._cache.items()
 
@@ -926,10 +929,18 @@ def rename(params: RenameParams) -> Optional[WorkspaceEdit]:
     return None
 
 
-def main() -> None:
+def main(argv: Optional[List[str]] = None) -> None:
     """Main entry point."""
+    parser = argparse.ArgumentParser(prog="gamess-lsp", description="GAMESS language server")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    parser.parse_args([] if argv is None else argv)
     server.start_io()
 
 
+def cli() -> None:
+    """Run the installed command-line entry point."""
+    main(sys.argv[1:])
+
+
 if __name__ == "__main__":
-    main()
+    cli()

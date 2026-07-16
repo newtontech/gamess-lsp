@@ -7,7 +7,7 @@
   "languageId": "gamess",
   "executable": "gamess-lsp",
   "defaultBranch": "main",
-  "releaseVersion": "0.1.0",
+  "releaseVersion": "0.1.1",
   "changelogPath": "CHANGELOG.md",
   "versionFilePath": "VERSION",
   "filePatterns": [

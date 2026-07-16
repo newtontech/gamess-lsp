@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PYTHON_BIN="${PYTHON:-python3}"
+PYTHON_BIN="${PYTHON:-}"
+if [ -z "$PYTHON_BIN" ] && [ -x .venv/bin/python ]; then
+  PYTHON_BIN=.venv/bin/python
+fi
+if [ -z "$PYTHON_BIN" ]; then
+  for candidate in python python3.12 python3.11 python3.10 python3; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+      PYTHON_BIN="$candidate"
+      break
+    fi
+  done
+fi
 
 ran=0
 

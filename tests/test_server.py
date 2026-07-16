@@ -2,6 +2,8 @@
 
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from gamess_lsp.server import (
     _get_diagnostics,
     _get_word_at_position,
@@ -22,7 +24,7 @@ class TestGAMESSServer:
         """Test server instance exists."""
         assert server is not None
         assert server.name == "gamess-lsp"
-        assert server.version == "0.1.0"
+        assert server.version == "0.1.1"
 
 
 class TestGetDiagnostics:
@@ -213,3 +215,13 @@ class TestMain:
 
         server_module.main()
         mock_start.assert_called_once()
+
+    @patch("gamess_lsp.server.server.start_io")
+    def test_help_is_nonblocking(self, mock_start, capsys):
+        """Installed CLI help must exit without starting the stdio server."""
+        with pytest.raises(SystemExit) as raised:
+            main(["--help"])
+
+        assert raised.value.code == 0
+        assert "usage: gamess-lsp" in capsys.readouterr().out
+        mock_start.assert_not_called()

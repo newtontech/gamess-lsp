@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional
 
 from lsprotocol.types import Diagnostic
 
+from .. import __version__
 from ..keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from ..parser import GAMESSParser
 
@@ -79,6 +80,7 @@ _DOMAIN_LANGUAGE = {
 # Issue #59: Section and keyword schema
 # ------------------------------------------------------------------
 
+
 def _build_section_schema() -> Dict[str, Any]:
     """Build the full section/keyword schema from the keywords database."""
     sections: Dict[str, Any] = {}
@@ -87,11 +89,11 @@ def _build_section_schema() -> Dict[str, Any]:
         keywords: Dict[str, Any] = {}
         for kw_name, kw_info in kw_db.items():
             keywords[kw_name] = {
-                "doc": kw_info.get("doc", "").strip(),
+                "doc": str(kw_info.get("doc", "")).strip(),
                 "values": kw_info.get("values", []),
             }
         sections[group_name] = {
-            "description": description.strip(),
+            "description": str(description).strip(),
             "keywords": keywords,
         }
     return sections
@@ -268,7 +270,8 @@ class AgentAPIProvider:
             Section schema dict or None if the section is unknown.
         """
         schema = get_section_schema()
-        return schema.get(section_name.upper())
+        section = schema.get(section_name.upper())
+        return section if isinstance(section, dict) else None
 
     def get_keyword_info(self, section_name: str, keyword_name: str) -> Optional[Dict[str, Any]]:
         """Look up schema information for a keyword within a section.
@@ -283,7 +286,11 @@ class AgentAPIProvider:
         section = self.get_section_info(section_name)
         if section is None:
             return None
-        return section.get("keywords", {}).get(keyword_name.upper())
+        keywords = section.get("keywords", {})
+        if not isinstance(keywords, dict):
+            return None
+        keyword = keywords.get(keyword_name.upper())
+        return keyword if isinstance(keyword, dict) else None
 
     def get_all_sections_json(self) -> str:
         """Return the full section/keyword schema as JSON."""
@@ -402,7 +409,7 @@ class AgentAPIProvider:
         ]
         return {
             "provider": "gamess-lsp",
-            "version": "0.1.0",
+            "version": __version__,
             "rule_count": len(rules),
             "rules": rules,
         }
@@ -439,8 +446,9 @@ class AgentAPIProvider:
         parsed = parser.parse(source)
 
         # Run lint
-        from .lint import LintProvider
         from pygls.server import LanguageServer
+
+        from .lint import LintProvider
 
         server = LanguageServer("smoke", "1.0")
         lint_provider = LintProvider(server)

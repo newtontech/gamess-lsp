@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1] - 2026-07-16
+
+### Added
+- Tag-only PyPI trusted-publishing workflow using GitHub OIDC and the protected `pypi` environment
+- Fresh-wheel release smoke covering installed version metadata, server help/version, agent CLI, and valid, invalid, and runtime-log fixtures
+
+### Changed
+- Aligned Python, VERSION, server, and OpenQC capability metadata for the 0.1.1 release
+
 ## [Unreleased]
 
 ### Added

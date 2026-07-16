@@ -12,7 +12,7 @@ framework (tests/validation/) for measured coverage.
 """
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
 
 from .constants import ELEMENT_ATOMIC_NUMBERS
 from .parser import GAMESSGroup, GAMESSInputFile
@@ -33,7 +33,7 @@ class SemanticValidator:
     """Validates GAMESS input files for semantic correctness."""
 
     # SCFTYP constraints
-    SCFTYP_MULT_CONSTRAINTS = {
+    SCFTYP_MULT_CONSTRAINTS: ClassVar[Dict[str, Dict[str, Any]]] = {
         "RHF": {
             "allowed_mult": [1],
             "description": "RHF (Restricted Hartree-Fock) 只能用于闭壳层体系",
@@ -57,7 +57,7 @@ class SemanticValidator:
     }
 
     # Method incompatibilities -- mutually exclusive post-HF / DFT methods
-    METHOD_INCOMPATIBILITIES = [
+    METHOD_INCOMPATIBILITIES: ClassVar[List[Dict[str, Any]]] = [
         {
             "condition": lambda kws: kws.get("DFTTYP") and kws.get("MPLEVL") == "2",
             "message": "DFT 与 MP2 不能同时使用。DFTTYP 用于 DFT 计算，MPLEVL=2 用于 MP2 计算，二者互斥。",
@@ -115,7 +115,7 @@ class SemanticValidator:
     ]
 
     # Required parameters/groups for specific run types
-    RUNTYP_REQUIREMENTS = {
+    RUNTYP_REQUIREMENTS: ClassVar[Dict[str, Dict[str, Any]]] = {
         "OPTIMIZE": {
             "required_groups": ["STATPT"],
             "message": "几何优化计算建议提供 $STATPT 组以控制优化参数",
@@ -144,7 +144,7 @@ class SemanticValidator:
     }
 
     # Cross-group conflicts: groups that should not coexist
-    CROSS_GROUP_CONFLICTS = [
+    CROSS_GROUP_CONFLICTS: ClassVar[List[Dict[str, Any]]] = [
         {
             "group_a": "SCF",
             "group_b": "MCSCF",
@@ -156,7 +156,7 @@ class SemanticValidator:
     ]
 
     # RUNTYP values that are incompatible with certain method choices
-    RUNTYP_METHOD_CONSTRAINTS = [
+    RUNTYP_METHOD_CONSTRAINTS: ClassVar[List[Dict[str, Any]]] = [
         {
             "runtyp": "SURFACE",
             "forbidden_kws": {"CCTYP": True},
@@ -182,7 +182,7 @@ class SemanticValidator:
         Returns:
             List of semantic diagnostics.
         """
-        diagnostics = []
+        diagnostics: List[SemanticDiagnostic] = []
 
         # Get $CONTRL group
         contrl = parsed_input.get_group("CONTRL")
@@ -215,7 +215,7 @@ class SemanticValidator:
         self, contrl: GAMESSGroup, contrl_kws: Dict[str, str]
     ) -> List[SemanticDiagnostic]:
         """Validate SCFTYP and MULT compatibility."""
-        diagnostics = []
+        diagnostics: List[SemanticDiagnostic] = []
 
         scftyp = contrl_kws.get("SCFTYP", "RHF")  # Default is RHF
         mult_str = contrl_kws.get("MULT", "1")  # Default is singlet
@@ -252,7 +252,7 @@ class SemanticValidator:
         self, contrl: GAMESSGroup, contrl_kws: Dict[str, str]
     ) -> List[SemanticDiagnostic]:
         """Validate method parameter compatibility."""
-        diagnostics = []
+        diagnostics: List[SemanticDiagnostic] = []
 
         for rule in self.METHOD_INCOMPATIBILITIES:
             if rule["condition"](contrl_kws):
@@ -271,7 +271,7 @@ class SemanticValidator:
         self, parsed_input: GAMESSInputFile, contrl: GAMESSGroup, contrl_kws: Dict[str, str]
     ) -> List[SemanticDiagnostic]:
         """Validate electron count vs multiplicity."""
-        diagnostics = []
+        diagnostics: List[SemanticDiagnostic] = []
 
         # Get electron count from geometry
         geometry = parsed_input.geometry
@@ -284,6 +284,7 @@ class SemanticValidator:
             # Try to get atomic number from Z field
             z = atom.get("z", atom.get("symbol", "0"))
             try:
+                z_num: float
                 if isinstance(z, str):
                     # Could be element symbol or atomic number string
                     if z.isdigit() or (z[0] == "-" and z[1:].isdigit()):
@@ -366,7 +367,7 @@ class SemanticValidator:
         self, parsed_input: GAMESSInputFile, contrl_kws: Dict[str, str]
     ) -> List[SemanticDiagnostic]:
         """Validate that required groups are present for specific run types."""
-        diagnostics = []
+        diagnostics: List[SemanticDiagnostic] = []
 
         runtyp = contrl_kws.get("RUNTYP", "ENERGY")
         contrl = parsed_input.get_group("CONTRL")
@@ -409,7 +410,7 @@ class SemanticValidator:
         self, parsed_input: GAMESSInputFile, contrl: GAMESSGroup, contrl_kws: Dict[str, str]
     ) -> List[SemanticDiagnostic]:
         """Validate that conflicting groups are not present together."""
-        diagnostics = []
+        diagnostics: List[SemanticDiagnostic] = []
 
         for rule in self.CROSS_GROUP_CONFLICTS:
             group_a = parsed_input.get_group(rule["group_a"])
@@ -457,7 +458,7 @@ class SemanticValidator:
         self, contrl: GAMESSGroup, contrl_kws: Dict[str, str]
     ) -> List[SemanticDiagnostic]:
         """Validate that RUNTYP is compatible with selected method."""
-        diagnostics = []
+        diagnostics: List[SemanticDiagnostic] = []
 
         runtyp = contrl_kws.get("RUNTYP", "ENERGY")
 
