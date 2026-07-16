@@ -3,7 +3,7 @@
 See also: wiki/entities/GAMESS.md
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from .keywords import GAMESS_GROUPS, GAMESS_KEYWORDS
 from .parser import GAMESSGroup, GAMESSInputFile, GAMESSKeyword, GAMESSParser, parse_gamess_input

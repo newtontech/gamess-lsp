@@ -3,6 +3,19 @@ set -euo pipefail
 
 ran=0
 
+python_bin="${PYTHON:-}"
+if [ -z "$python_bin" ] && [ -x .venv/bin/python ]; then
+  python_bin=.venv/bin/python
+fi
+if [ -z "$python_bin" ]; then
+  for candidate in python python3.12 python3.11 python3.10 python3; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+      python_bin="$candidate"
+      break
+    fi
+  done
+fi
+
 has_npm_script() {
   local script="$1"
   [ -f package.json ] || return 1
@@ -36,9 +49,9 @@ if [ -f Cargo.toml ]; then
 fi
 
 if [ -f pyproject.toml ] || [ -f setup.py ] || [ -f mypy.ini ]; then
-  if python -m mypy --version >/dev/null 2>&1; then
+  if "$python_bin" -m mypy --version >/dev/null 2>&1; then
     py_targets="$(python_typecheck_targets)"
-    python -m mypy $py_targets
+    "$python_bin" -m mypy $py_targets
     ran=1
   fi
 fi
